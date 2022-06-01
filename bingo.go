@@ -16,6 +16,7 @@ import (
 // Bingo 脚手架
 type Bingo struct {
 	*gin.Engine
+	group *gin.RouterGroup
 }
 
 // Init 初始化
@@ -24,14 +25,20 @@ func Init() *Bingo {
 	return b
 }
 
-// Group 路由分组
-func (b *Bingo) Group() *Bingo {
-	return b
-}
-
 // Route 路由
 func (b *Bingo) Route(group string, callback func(group *Group)) *Bingo {
 	callback(NewGroup(b.Engine.Group(group)))
+	return b
+}
+
+// Mount 挂载控制器
+func (b *Bingo) Mount(group string, controller ...Controller) *Bingo {
+	b.group = b.Group(group)
+
+	for _, c := range controller {
+		c.Route(NewGroup(b.group))
+	}
+
 	return b
 }
 
