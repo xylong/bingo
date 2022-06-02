@@ -1,6 +1,9 @@
 package v1
 
-import "github.com/xylong/bingo"
+import (
+	"github.com/xylong/bingo"
+	"time"
+)
 
 type UserController struct {
 }
@@ -30,8 +33,14 @@ func (c *UserController) logout(ctx *bingo.Context) string {
 	return "logout"
 }
 
-func (c *UserController) me(ctx *bingo.Context) string {
-	return "me"
+func (c *UserController) me(ctx *bingo.Context) bingo.Json {
+	return struct {
+		ID   int    `json:"id"`
+		Name string `json:"name"`
+	}{
+		ID:   int(time.Now().Unix()),
+		Name: "summer",
+	}
 }
 
 func (c *UserController) update(ctx *bingo.Context) string {

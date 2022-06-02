@@ -32,11 +32,13 @@ func (b *Bingo) Route(group string, callback func(group *Group)) *Bingo {
 }
 
 // Mount 挂载控制器
-func (b *Bingo) Mount(group string, controller ...Controller) *Bingo {
+func (b *Bingo) Mount(group string, middleware []Middleware, controller ...Controller) *Bingo {
 	b.group = b.Group(group)
 
 	for _, c := range controller {
-		c.Route(NewGroup(b.group))
+		g := NewGroup(b.group)
+		g.middlewares = append(g.middlewares, middleware...)
+		c.Route(g)
 	}
 
 	return b

@@ -10,6 +10,7 @@ import (
 type Group struct {
 	*gin.RouterGroup
 	group string
+	middlewares
 }
 
 func NewGroup(routerGroup *gin.RouterGroup) *Group {
@@ -49,6 +50,8 @@ func (g *Group) DELETE(relativePath string, handler interface{}) {
 
 func (g *Group) handle(httpMethod, relativePath string, handler interface{}) {
 	if f := convert(handler); f != nil {
-		g.Handle(httpMethod, strings.Trim(g.group+"/"+relativePath, "/"), f)
+		g.Handle(httpMethod, strings.Trim(g.group+"/"+relativePath, "/"), func(context *gin.Context) {
+			g.middlewares.before(NewContext(context))
+		}, f)
 	}
 }
