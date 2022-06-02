@@ -2,6 +2,7 @@ package v1
 
 import (
 	"github.com/xylong/bingo"
+	"github.com/xylong/bingo/test/internal/middleware"
 	"time"
 )
 
@@ -13,12 +14,15 @@ func NewUserController() *UserController {
 }
 
 func (c *UserController) Route(group *bingo.Group) {
+	group.Group("", func(users *bingo.Group) {
+		users.GET("me", c.me)
+		users.PUT("me", c.update)
+		users.GET("friends", c.friend)
+	}, middleware.NewAuthorization())
+
 	group.POST("register", c.register)
 	group.POST("login", c.login)
 	group.DELETE("logout", c.logout)
-	group.GET("me", c.me)
-	group.PUT("me", c.update)
-	group.GET("friends", c.friend)
 }
 
 func (c *UserController) register(ctx *bingo.Context) string {

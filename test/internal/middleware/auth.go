@@ -15,6 +15,8 @@ func NewAuthorization() *Authorization {
 
 func (a *Authorization) Before(ctx *bingo.Context) error {
 	token := ctx.Token()
-	fmt.Println(token, "测试")
+	if token == "" {
+		return fmt.Errorf("unauthorized")
+	}
 	return nil
 }

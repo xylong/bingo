@@ -18,9 +18,10 @@ func NewGroup(routerGroup *gin.RouterGroup) *Group {
 }
 
 // Group 路由分组
-func (g *Group) Group(group string, callback func(ig *Group)) {
-	g.group = group + "/"
-	callback(g)
+func (g Group) Group(group string, callback func(*Group), middleware ...Middleware) {
+	g.middlewares = append(g.middlewares, middleware...)
+	g.group += group + "/"
+	callback(&g)
 }
 
 // GET get请求
