@@ -8,6 +8,6 @@ import (
 
 func main() {
 	bingo.Init().
-		Mount("v1", []bingo.Middleware{middleware.NewLogger()}, v1.NewUserController()).
+		Mount("v1", v1.NewUserController())(middleware.NewLogger()).
 		Lunch()
 }
