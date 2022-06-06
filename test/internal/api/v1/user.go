@@ -2,7 +2,9 @@ package v1
 
 import (
 	"github.com/xylong/bingo"
+	"github.com/xylong/bingo/test/internal/dto"
 	"github.com/xylong/bingo/test/internal/middleware"
+	"github.com/xylong/bingo/test/internal/model/user"
 	"time"
 )
 
@@ -20,13 +22,18 @@ func (c *UserController) Route(group *bingo.Group) {
 		users.GET("friends", c.friend)
 	}, middleware.NewAuthorization())
 
-	group.POST("register", c.register)
+	group.POST("register", bingo.NewBind[dto.RegisterForm]().
+		Try(c.register).
+		Catch(func(ctx *bingo.Context, err error) {
+			ctx.AbortWithStatusJSON(400, map[string]interface{}{"error": err.Error()})
+		}).
+		Complete())
 	group.POST("login", c.login)
 	group.DELETE("logout", c.logout)
 }
 
-func (c *UserController) register(ctx *bingo.Context) string {
-	return "foo"
+func (c *UserController) register(ctx *bingo.Context,form *dto.RegisterForm)  {
+	ctx.JSON(200,form)
 }
 
 func (c *UserController) login(ctx *bingo.Context) string {
@@ -38,12 +45,10 @@ func (c *UserController) logout(ctx *bingo.Context) string {
 }
 
 func (c *UserController) me(ctx *bingo.Context) bingo.Json {
-	return struct {
-		ID   int    `json:"id"`
-		Name string `json:"name"`
-	}{
-		ID:   int(time.Now().Unix()),
-		Name: "summer",
+	return user.User{
+		ID:        int(time.Now().Unix()),
+		Nickname:  "summer",
+		CreatedAt: time.Time{},
 	}
 }
 
