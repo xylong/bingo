@@ -12,7 +12,7 @@ type Controller interface {
 
 // Bind 参数绑定
 type Bind[T any] struct {
-	try func(ctx *Context, t *T)
+	try   func(ctx *Context, t *T) Json
 	catch func(ctx *Context, err error)
 }
 
@@ -21,18 +21,18 @@ func NewBind[T any]() *Bind[T] {
 }
 
 // Try 参数绑定验证通过执行
-func (b *Bind[T]) Try(f func(ctx *Context,t *T)) *Bind[T] {
+func (b *Bind[T]) Try(f func(ctx *Context, t *T) Json) *Bind[T] {
 	b.try = f
 	return b
 }
 
 // Catch 失败执行
-func (b *Bind[T]) Catch(f ...func(ctx *Context,err error)) *Bind[T] {
-	if len(f)>0 {
-		b.catch=f[0]
+func (b *Bind[T]) Catch(f ...func(ctx *Context, err error)) *Bind[T] {
+	if len(f) > 0 {
+		b.catch = f[0]
 	} else {
-		b.catch= func(ctx *Context, err error) {
-			ctx.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error":err.Error()})
+		b.catch = func(ctx *Context, err error) {
+			ctx.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		}
 	}
 
@@ -40,14 +40,15 @@ func (b *Bind[T]) Catch(f ...func(ctx *Context,err error)) *Bind[T] {
 }
 
 // Complete 完成调用
-func (b *Bind[T]) Complete() func(ctx *Context) {
-	return func(ctx *Context) {
+func (b *Bind[T]) Complete() func(ctx *Context) Json {
+	return func(ctx *Context) Json {
 		var t T
 
-		if err:=ctx.ShouldBind(&t);err!=nil {
-			b.catch(ctx,err)
+		if err := ctx.ShouldBind(&t); err != nil {
+			b.catch(ctx, err)
+			return nil
 		} else {
-			b.try(ctx,&t)
+			return b.try(ctx, &t)
 		}
 	}
 }

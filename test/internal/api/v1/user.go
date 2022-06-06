@@ -1,11 +1,11 @@
 package v1
 
 import (
+	"fmt"
 	"github.com/xylong/bingo"
 	"github.com/xylong/bingo/test/internal/dto"
 	"github.com/xylong/bingo/test/internal/middleware"
 	"github.com/xylong/bingo/test/internal/model/user"
-	"net/http"
 	"time"
 )
 
@@ -28,16 +28,17 @@ func (c *UserController) Route(group *bingo.Group) {
 	group.DELETE("logout", c.logout)
 }
 
-func (c *UserController) register(ctx *bingo.Context,form *dto.RegisterForm) {
-	ctx.JSON(http.StatusOK, form)
+func (c *UserController) register(ctx *bingo.Context, form *dto.RegisterForm) bingo.Json {
+	//ctx.JSON(http.StatusOK, form)
+	return form
 }
 
 func (c *UserController) login(ctx *bingo.Context) string {
 	return "login"
 }
 
-func (c *UserController) logout(ctx *bingo.Context) string {
-	return "logout"
+func (c *UserController) logout(ctx *bingo.Context) {
+	fmt.Println("a")
 }
 
 func (c *UserController) me(ctx *bingo.Context) bingo.Json {
