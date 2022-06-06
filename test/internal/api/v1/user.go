@@ -5,6 +5,7 @@ import (
 	"github.com/xylong/bingo/test/internal/dto"
 	"github.com/xylong/bingo/test/internal/middleware"
 	"github.com/xylong/bingo/test/internal/model/user"
+	"net/http"
 	"time"
 )
 
@@ -22,18 +23,13 @@ func (c *UserController) Route(group *bingo.Group) {
 		users.GET("friends", c.friend)
 	}, middleware.NewAuthorization())
 
-	group.POST("register", bingo.NewBind[dto.RegisterForm]().
-		Try(c.register).
-		Catch(func(ctx *bingo.Context, err error) {
-			ctx.AbortWithStatusJSON(400, map[string]interface{}{"error": err.Error()})
-		}).
-		Complete())
+	group.POST("register", bingo.NewBind[dto.RegisterForm]().Try(c.register).Catch().Complete())
 	group.POST("login", c.login)
 	group.DELETE("logout", c.logout)
 }
 
-func (c *UserController) register(ctx *bingo.Context,form *dto.RegisterForm)  {
-	ctx.JSON(200,form)
+func (c *UserController) register(ctx *bingo.Context,form *dto.RegisterForm) {
+	ctx.JSON(http.StatusOK, form)
 }
 
 func (c *UserController) login(ctx *bingo.Context) string {
