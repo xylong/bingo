@@ -12,7 +12,7 @@ type Controller interface {
 
 // Bind 参数绑定
 type Bind[T any] struct {
-	try   func(ctx *Context, t *T) Json
+	try   func(ctx *Context, t *T) any
 	catch func(ctx *Context, err error)
 }
 
@@ -21,7 +21,7 @@ func NewBind[T any]() *Bind[T] {
 }
 
 // Try 参数绑定验证通过执行
-func (b *Bind[T]) Try(f func(ctx *Context, t *T) Json) *Bind[T] {
+func (b *Bind[T]) Try(f func(ctx *Context, t *T) any) *Bind[T] {
 	b.try = f
 	return b
 }
@@ -40,8 +40,8 @@ func (b *Bind[T]) Catch(f ...func(ctx *Context, err error)) *Bind[T] {
 }
 
 // Complete 完成调用
-func (b *Bind[T]) Complete() func(ctx *Context) Json {
-	return func(ctx *Context) Json {
+func (b *Bind[T]) Complete() func(ctx *Context) any {
+	return func(ctx *Context) any {
 		var t T
 
 		if err := ctx.ShouldBind(&t); err != nil {

@@ -24,16 +24,16 @@ func (c *UserController) Route(group *bingo.Group) {
 	}, middleware.NewAuthorization())
 
 	group.POST("register", bingo.NewBind[dto.RegisterForm]().Try(c.register).Catch().Complete())
-	group.POST("login", c.login)
+	group.POST("login", bingo.NewBind[dto.RegisterForm]().Try(c.login).Catch().Complete())
 	group.DELETE("logout", c.logout)
 }
 
-func (c *UserController) register(ctx *bingo.Context, form *dto.RegisterForm) bingo.Json {
+func (c *UserController) register(ctx *bingo.Context, form *dto.RegisterForm) any {
 	//ctx.JSON(http.StatusOK, form)
 	return form
 }
 
-func (c *UserController) login(ctx *bingo.Context) string {
+func (c *UserController) login(ctx *bingo.Context, form *dto.RegisterForm) any {
 	return "login"
 }
 
