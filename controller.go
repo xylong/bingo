@@ -1,10 +1,5 @@
 package bingo
 
-import (
-	"github.com/gin-gonic/gin"
-	"net/http"
-)
-
 // Controller 控制器
 type Controller interface {
 	Route(group *Group)
@@ -12,6 +7,7 @@ type Controller interface {
 
 // Bind 参数绑定
 type Bind[T any] struct {
+	err   error
 	try   func(ctx *Context, t *T) any
 	catch func(ctx *Context, err error)
 }
@@ -32,7 +28,7 @@ func (b *Bind[T]) Catch(f ...func(ctx *Context, err error)) *Bind[T] {
 		b.catch = f[0]
 	} else {
 		b.catch = func(ctx *Context, err error) {
-			ctx.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+			b.err = err
 		}
 	}
 
@@ -46,7 +42,7 @@ func (b *Bind[T]) Complete() func(ctx *Context) any {
 
 		if err := ctx.ShouldBind(&t); err != nil {
 			b.catch(ctx, err)
-			return nil
+			return b.err
 		} else {
 			return b.try(ctx, &t)
 		}

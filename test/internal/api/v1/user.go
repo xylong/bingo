@@ -29,7 +29,6 @@ func (c *UserController) Route(group *bingo.Group) {
 }
 
 func (c *UserController) register(ctx *bingo.Context, form *dto.RegisterForm) any {
-	//ctx.JSON(http.StatusOK, form)
 	return form
 }
 

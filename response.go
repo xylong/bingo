@@ -21,6 +21,7 @@ type (
 	Json interface{}
 
 	stringResponder  func(*Context) string
+	errorResponder   func(*Context) error
 	anyResponder     func(*Context) any
 	defaultResponder func(*Context)
 )
@@ -31,9 +32,27 @@ func (r stringResponder) Return() gin.HandlerFunc {
 	}
 }
 
+func (r errorResponder) Return() gin.HandlerFunc {
+	return func(context *gin.Context) {
+		err := r(NewContext(context))
+		context.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+	}
+}
+
 func (r anyResponder) Return() gin.HandlerFunc {
 	return func(context *gin.Context) {
-		context.JSON(http.StatusOK, r(NewContext(context)))
+		data := r(NewContext(context))
+
+		switch value := data.(type) {
+		case string:
+			context.String(http.StatusOK, value)
+		case error:
+			context.JSON(http.StatusBadRequest, gin.H{
+				"error": value.Error(),
+			})
+		default:
+			context.JSON(http.StatusOK, value)
+		}
 	}
 }
 
