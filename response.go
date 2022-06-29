@@ -11,19 +11,33 @@ var responderList []iface.Responder
 
 func init() {
 	responderList = []iface.Responder{
+		(defaultResponder)(nil),
 		(stringResponder)(nil),
 		(jsonResponder)(nil),
-		(defaultResponder)(nil),
+		(apiResponder)(nil),
 	}
 }
 
 type (
 	Json interface{}
 
+	apiResponder     func(*Context) (int, string, interface{})
 	stringResponder  func(*Context) string
 	jsonResponder    func(*Context) Json
 	defaultResponder func(*Context)
 )
+
+func (r apiResponder) Return() gin.HandlerFunc {
+	return func(context *gin.Context) {
+		code, message, data := r(NewContext(context))
+
+		context.JSON(http.StatusOK, gin.H{
+			"code":    code,
+			"message": message,
+			"data":    data,
+		})
+	}
+}
 
 func (r stringResponder) Return() gin.HandlerFunc {
 	return func(context *gin.Context) {

@@ -3,9 +3,9 @@ package v1
 import (
 	"fmt"
 	"github.com/xylong/bingo"
+	"github.com/xylong/bingo/test/internal/domain/model/user"
 	"github.com/xylong/bingo/test/internal/dto"
 	"github.com/xylong/bingo/test/internal/middleware"
-	"github.com/xylong/bingo/test/internal/model/user"
 	"time"
 )
 
@@ -23,14 +23,20 @@ func (c *UserController) Route(group *bingo.Group) {
 		users.GET("friends", c.friend)
 	}, middleware.NewAuthorization())
 
-	group.POST("register", bingo.NewBind[dto.RegisterForm]().Try(c.register).Catch().Complete())
+	group.POST("register", c.register)
 	group.POST("login", c.login)
 	group.DELETE("logout", c.logout)
 }
 
-func (c *UserController) register(ctx *bingo.Context, form *dto.RegisterForm) bingo.Json {
-	//ctx.JSON(http.StatusOK, form)
-	return form
+func (c *UserController) register(ctx *bingo.Context) (int, string, interface{}) {
+	form := &dto.RegisterForm{}
+
+	err := ctx.ShouldBind(form)
+	if err != nil {
+		return 400, "参数错误", nil
+	}
+
+	return 0, "", "hello"
 }
 
 func (c *UserController) login(ctx *bingo.Context) string {
