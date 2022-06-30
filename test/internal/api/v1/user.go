@@ -49,9 +49,8 @@ func (c *UserController) logout(ctx *bingo.Context) {
 
 func (c *UserController) me(ctx *bingo.Context) bingo.Json {
 	return user.User{
-		ID:        int(time.Now().Unix()),
-		Nickname:  "summer",
-		CreatedAt: time.Time{},
+		ID:       int(time.Now().Unix()),
+		Nickname: "summer",
 	}
 }
 

@@ -24,13 +24,14 @@ type User struct {
 	Password  string         `gorm:"type:varchar(32);comment:密码" json:"password"`
 	Birthday  time.Time      `gorm:"type:date;default:null;comment:出生日期" json:"birthday"`
 	Gender    int            `gorm:"type:tinyint(1);default:-1;comment:-1保密 0女 1男" json:"gender"`
-	Info      *UserInfo      // has one
 	CreatedAt time.Time      `json:"created_at"`
 	UpdatedAt time.Time      `json:"updated_at"`
 	DeletedAt gorm.DeletedAt `gorm:"index;->:false;"`
+
+	Info *UserInfo // has one
 }
 
-func NewUser(attr ...Attr) *User {
+func New(attr ...Attr) *User {
 	u := &User{
 		Info: NewUserInfo(),
 	}
@@ -54,11 +55,5 @@ func WithName(name string) Attr {
 func WithPassword(password string) Attr {
 	return func(user *User) {
 		user.Password = password
-	}
-}
-
-func WithUnionid(unionid string) Attr {
-	return func(user *User) {
-		user.Info.WechatUnionid = unionid
 	}
 }

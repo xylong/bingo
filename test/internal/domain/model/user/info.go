@@ -16,3 +16,21 @@ type UserInfo struct {
 func NewUserInfo() *UserInfo {
 	return &UserInfo{}
 }
+
+func WithUnionid(unionid string) Attr {
+	return func(user *User) {
+		user.Info.WechatUnionid = unionid
+	}
+}
+
+func WithAppletOpenid(openid string) Attr {
+	return func(user *User) {
+		user.Info.WechatAppletOpenid = openid
+	}
+}
+
+func WithOfficialOpenid(openid string) Attr {
+	return func(user *User) {
+		user.Info.WechatOfficialOpenid = openid
+	}
+}
