@@ -45,7 +45,7 @@ type User struct {
 
 	Profile *profile.Profile // has one
 
-	repo repository.IUserRepo
+	repo repository.IUserRepo `gorm:"-"`
 }
 
 func (u *User) Get() error {

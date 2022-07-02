@@ -6,14 +6,16 @@ import (
 	"gorm.io/gorm"
 )
 
-type UserRepo struct {
+// UserDao 用户
+type UserDao struct {
 	db *gorm.DB
 }
 
-func NewUserRepo(db *gorm.DB) *UserRepo {
-	return &UserRepo{db: db}
+func NewUserDao(db *gorm.DB) *UserDao {
+	return &UserDao{db: db}
 }
 
-func (r *UserRepo) GetByID(model repository.IModel) error {
+// GetByID 根据主键🆔获取
+func (r *UserDao) GetByID(model repository.IModel) error {
 	return r.db.First(model, model.(*user.User).ID).Error
 }
