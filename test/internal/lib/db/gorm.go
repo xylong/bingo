@@ -3,6 +3,10 @@ package db
 import (
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
+	"gorm.io/gorm/logger"
+	"log"
+	"os"
+	"time"
 )
 
 var DB *gorm.DB
@@ -18,6 +22,12 @@ func InitGorm() *gorm.DB {
 		SkipInitializeWithVersion: false,
 		DefaultStringSize:         191,
 	}), &gorm.Config{
+		Logger: logger.New(log.New(os.Stdout, "\r\n", log.LstdFlags), logger.Config{
+			SlowThreshold:             time.Second,
+			Colorful:                  true,
+			IgnoreRecordNotFoundError: false,
+			LogLevel:                  logger.Info,
+		}),
 		SkipDefaultTransaction:                   false,
 		DisableForeignKeyConstraintWhenMigrating: true,
 	})

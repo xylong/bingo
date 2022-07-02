@@ -6,9 +6,7 @@ go get -u github.com/xylong/bingo
 ```
 
 ### 功能
-- [x] 请求参数
-    - [x] 自动映射参数
-    - [x] 自动校验
+- [x] 控制器
 - [x] 路由
     - [x] 分组
     - [ ] 限流

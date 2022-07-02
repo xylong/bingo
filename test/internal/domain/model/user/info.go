@@ -1,36 +1,45 @@
 package user
 
-import "time"
-
-// UserInfo 用户信息
-type UserInfo struct {
-	ID                   int       `gorm:"primaryKey;autoIncrement;" json:"id"`
-	UserID               int       `gorm:"type:int(11);;not null;uniqueIndex;comment:用户🆔" json:"user_id"`
-	WechatUnionid        string    `gorm:"type:varchar(100);default:null;uniqueIndex;comment:微信unionid" json:"wechat_unionid"`
-	WechatAppletOpenid   string    `gorm:"type:varchar(100);default:null;uniqueIndex;comment:微信小程序🆔" json:"wechat_applet_openid"`
-	WechatOfficialOpenid string    `gorm:"type:varchar(100);default:null;uniqueIndex;comment:微信公众号🆔" json:"wechat_official_openid"`
-	CreatedAt            time.Time `json:"created_at"`
-	UpdatedAt            time.Time `json:"updated_at"`
+// Info 用户信息
+type Info struct {
+	Avatar   string `gorm:"type:varchar(100);comment:头像" json:"avatar"`
+	Nickname string `gorm:"type:varchar(20);not null;comment:昵称" json:"nickname"`
+	Phone    string `gorm:"type:char(11);uniqueIndex;comment:手机号" json:"phone"`
+	Email    string `gorm:"type:varchar(50);default:null;uniqueIndex;comment:邮件" json:"email"`
 }
 
-func NewUserInfo() *UserInfo {
-	return &UserInfo{}
+func NewInfo() *Info {
+	return &Info{}
 }
 
-func WithUnionid(unionid string) Attr {
+func WithAvatar(avatar string) Attr {
 	return func(user *User) {
-		user.Info.WechatUnionid = unionid
+		if avatar != "" {
+			user.Avatar = avatar
+		}
 	}
 }
 
-func WithAppletOpenid(openid string) Attr {
+func WithNickName(name string) Attr {
 	return func(user *User) {
-		user.Info.WechatAppletOpenid = openid
+		if name != "" {
+			user.Nickname = name
+		}
 	}
 }
 
-func WithOfficialOpenid(openid string) Attr {
+func WithPhone(phone string) Attr {
 	return func(user *User) {
-		user.Info.WechatOfficialOpenid = openid
+		if phone != "" {
+			user.Phone = phone
+		}
+	}
+}
+
+func WithEmail(email string) Attr {
+	return func(user *User) {
+		if email != "" {
+			user.Email = email
+		}
 	}
 }

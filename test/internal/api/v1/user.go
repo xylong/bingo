@@ -2,11 +2,14 @@ package v1
 
 import (
 	"fmt"
+	"github.com/gin-gonic/gin"
 	"github.com/xylong/bingo"
 	"github.com/xylong/bingo/test/internal/domain/model/user"
 	"github.com/xylong/bingo/test/internal/dto"
+	"github.com/xylong/bingo/test/internal/infrastructure/GromDao"
+	"github.com/xylong/bingo/test/internal/lib/db"
 	"github.com/xylong/bingo/test/internal/middleware"
-	"time"
+	"strconv"
 )
 
 func init() {
@@ -40,25 +43,39 @@ func (c *UserController) logout(ctx *bingo.Context) {
 }
 
 func (c *UserController) me(ctx *bingo.Context) bingo.Json {
-	return user.User{
-		ID:       int(time.Now().Unix()),
-		Nickname: "summer",
-	}
+	return user.New(
+		user.WithNickName("静静"),
+		user.WithPhone("19987654320"),
+		user.WithUnionid("abcd1234"),
+	)
 }
 
 func (c *UserController) update(ctx *bingo.Context) string {
 	return "update"
 }
 
-func (c *UserController) friend(ctx *bingo.Context) string {
-	return "friend"
+func (c *UserController) profile(ctx *bingo.Context) bingo.Json {
+	id, err := strconv.Atoi(ctx.Param("id"))
+	if err != nil {
+		return gin.H{"error": err.Error()}
+	}
+
+	repo := GromDao.NewUserRepo(db.DB)
+	u := user.New(user.WithRepo(repo))
+	u.ID = id
+
+	if err := u.Get(); err != nil {
+		return gin.H{"error": err.Error()}
+	} else {
+		return u
+	}
 }
 
 func (c *UserController) Route(group *bingo.Group) {
 	group.Group("", func(users *bingo.Group) {
 		users.GET("me", c.me)
 		users.PUT("me", c.update)
-		users.GET("friends", c.friend)
+		users.GET("users/:id", c.profile)
 	}, middleware.NewAuthorization())
 
 	group.POST("register", c.register)
