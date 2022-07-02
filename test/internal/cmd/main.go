@@ -13,6 +13,6 @@ func init() {
 
 func main() {
 	bingo.Init().
-		Mount("v1", v1.NewUserController())(middleware.NewLogger()).
+		Mount("v1", v1.Controllers...)(middleware.NewLogger()).
 		Lunch()
 }

@@ -9,23 +9,15 @@ import (
 	"time"
 )
 
+func init() {
+	RegisterController(NewUserController())
+}
+
 type UserController struct {
 }
 
 func NewUserController() *UserController {
 	return &UserController{}
-}
-
-func (c *UserController) Route(group *bingo.Group) {
-	group.Group("", func(users *bingo.Group) {
-		users.GET("me", c.me)
-		users.PUT("me", c.update)
-		users.GET("friends", c.friend)
-	}, middleware.NewAuthorization())
-
-	group.POST("register", c.register)
-	group.POST("login", c.login)
-	group.DELETE("logout", c.logout)
 }
 
 func (c *UserController) register(ctx *bingo.Context) (int, string, interface{}) {
@@ -60,4 +52,16 @@ func (c *UserController) update(ctx *bingo.Context) string {
 
 func (c *UserController) friend(ctx *bingo.Context) string {
 	return "friend"
+}
+
+func (c *UserController) Route(group *bingo.Group) {
+	group.Group("", func(users *bingo.Group) {
+		users.GET("me", c.me)
+		users.PUT("me", c.update)
+		users.GET("friends", c.friend)
+	}, middleware.NewAuthorization())
+
+	group.POST("register", c.register)
+	group.POST("login", c.login)
+	group.DELETE("logout", c.logout)
 }
