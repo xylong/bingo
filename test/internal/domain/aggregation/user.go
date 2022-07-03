@@ -1,10 +1,10 @@
 package aggregation
 
 import (
-	"fmt"
 	"github.com/xylong/bingo/test/internal/domain/model/profile"
 	"github.com/xylong/bingo/test/internal/domain/model/repository"
 	"github.com/xylong/bingo/test/internal/domain/model/user"
+	error2 "github.com/xylong/bingo/test/internal/infrastructure/error"
 )
 
 // FrontUserAgg 前台展示
@@ -27,15 +27,15 @@ func NewFrontUserAgg(user *user.User, profile *profile.Profile, userRepo reposit
 
 func (u *FrontUserAgg) Get() error {
 	if u.User.ID <= 0 {
-		return fmt.Errorf("root error: %s", "user model's is zero")
+		return error2.NewNoIDError("user")
 	}
 
 	if err := u.User.Get(); err != nil {
-		return fmt.Errorf("user data error: %s", err.Error())
+		return error2.NewNoDataError("user")
 	}
 
 	if err := u.Profile.Get(); err != nil {
-		return fmt.Errorf("profile data error:%s", err.Error())
+		return error2.NewNoDataError("profile")
 	}
 
 	return nil

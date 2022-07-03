@@ -70,14 +70,18 @@ func (c *UserController) profile(ctx *bingo.Context) bingo.Json {
 		return gin.H{"error": err.Error()}
 	}
 
-	repo := GromDao.NewUserDao(db.DB)
-	u := user.New(user.WithRepo(repo))
-	u.ID = id
+	up, pp := GromDao.NewUserDao(db.DB), GromDao.NewProfileDao(db.DB)
+	u, p := user.New(user.WithRepo(up)), profile.New(profile.WithRepo(pp))
 
-	if err := u.Get(); err != nil {
-		return gin.H{"error": err.Error()}
+	u.ID = id
+	p.UserID = u.ID
+
+	agg := aggregation.NewFrontUserAgg(u, p, up, pp)
+	if err := agg.Get(); err == nil {
+		agg.User.Profile = agg.Profile
+		return agg.User
 	} else {
-		return u
+		return err
 	}
 }
 
