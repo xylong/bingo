@@ -16,6 +16,14 @@ func (a Attrs) apply(profile *Profile) {
 	}
 }
 
+func WithUserID(id int) Attr {
+	return func(profile *Profile) {
+		if id > 0 {
+			profile.UserID = id
+		}
+	}
+}
+
 func WithPassword(password string) Attr {
 	return func(profile *Profile) {
 		if len(password) > 0 {
@@ -58,7 +66,7 @@ func WithSignature(signature string) Attr {
 
 func WithRepo(repo repository.IProfileRepo) Attr {
 	return func(profile *Profile) {
-		profile.repo = repo
+		profile.Repo = repo
 	}
 }
 
@@ -74,7 +82,7 @@ type Profile struct {
 	CreatedAt time.Time `json:"created_at"`
 	UpdatedAt time.Time `json:"updated_at"`
 
-	repo repository.IProfileRepo `gorm:"-"`
+	Repo repository.IProfileRepo `gorm:"-"`
 }
 
 func New(attr ...Attr) *Profile {
@@ -89,5 +97,9 @@ func (p *Profile) Name() string {
 }
 
 func (p *Profile) Get() error {
-	return p.repo.GetByUser(p)
+	return p.Repo.GetByUser(p)
+}
+
+func (p *Profile) Create() error {
+	return p.Repo.Create(p)
 }

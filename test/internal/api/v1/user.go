@@ -8,7 +8,7 @@ import (
 	"github.com/xylong/bingo/test/internal/domain/model/profile"
 	"github.com/xylong/bingo/test/internal/domain/model/user"
 	"github.com/xylong/bingo/test/internal/dto"
-	"github.com/xylong/bingo/test/internal/infrastructure/GromDao"
+	"github.com/xylong/bingo/test/internal/infrastructure/GormDao"
 	"github.com/xylong/bingo/test/internal/lib/db"
 	"github.com/xylong/bingo/test/internal/middleware"
 	"strconv"
@@ -33,7 +33,17 @@ func (c *UserController) register(ctx *bingo.Context) (int, string, interface{})
 		return 400, "参数错误", nil
 	}
 
-	return 0, "", "hello"
+	tx := db.DB.Begin()
+	up, pp := GormDao.NewUserDao(tx), GormDao.NewProfileDao(tx)
+	u := user.New(user.WithPhone(form.Phone))
+	p := profile.New(profile.WithPassword(form.Password))
+
+	agg := aggregation.NewFrontUserAgg(u, p, up, pp)
+	if err := agg.CreateUser(); err == nil {
+		return 0, "", agg.User
+	} else {
+		return 400, err.Error(), nil
+	}
 }
 
 func (c *UserController) login(ctx *bingo.Context) string {
@@ -45,8 +55,8 @@ func (c *UserController) logout(ctx *bingo.Context) {
 }
 
 func (c *UserController) me(ctx *bingo.Context) bingo.Json {
-	up, pp := GromDao.NewUserDao(db.DB), GromDao.NewProfileDao(db.DB)
-	u, p := user.New(user.WithRepo(up)), profile.New(profile.WithRepo(pp))
+	up, pp := GormDao.NewUserDao(db.DB), GormDao.NewProfileDao(db.DB)
+	u, p := user.New(), profile.New()
 
 	u.ID = 1
 	p.UserID = u.ID
@@ -70,11 +80,8 @@ func (c *UserController) profile(ctx *bingo.Context) bingo.Json {
 		return gin.H{"error": err.Error()}
 	}
 
-	up, pp := GromDao.NewUserDao(db.DB), GromDao.NewProfileDao(db.DB)
-	u, p := user.New(user.WithRepo(up)), profile.New(profile.WithRepo(pp))
-
-	u.ID = id
-	p.UserID = u.ID
+	up, pp := GormDao.NewUserDao(db.DB), GormDao.NewProfileDao(db.DB)
+	u, p := user.New(user.WithID(id)), profile.New(profile.WithUserID(id))
 
 	agg := aggregation.NewFrontUserAgg(u, p, up, pp)
 	if err := agg.Get(); err == nil {

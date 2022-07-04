@@ -16,4 +16,5 @@ const (
 
 	ZeroIEntityD Code = 10001 // 没有实体🆔
 	NotFoundData Code = 10002 // 未找到数据
+	InsertError  Code = 10003 // 数据创建错误
 )

@@ -22,6 +22,8 @@ func NewFrontUserAgg(user *user.User, profile *profile.Profile, userRepo reposit
 	}
 
 	fu := &FrontUserAgg{User: user, Profile: profile, UserRepo: userRepo, ProfileRepo: profileRepo}
+	fu.User.Repo, fu.ProfileRepo = userRepo, profileRepo
+
 	return fu
 }
 
@@ -36,6 +38,22 @@ func (u *FrontUserAgg) Get() error {
 
 	if err := u.Profile.Get(); err != nil {
 		return error2.NewNoDataError("profile")
+	}
+
+	return nil
+}
+
+// CreateUser 创建用户
+func (u *FrontUserAgg) CreateUser() error {
+	// 创建用户基础
+	if err := u.User.Create(); err != nil {
+		return error2.NewCreateError("user", err.Error())
+	}
+
+	// 创建用户信息
+	u.Profile.UserID = u.User.ID
+	if err := u.Profile.Create(); err != nil {
+		return error2.NewCreateError("profile", err.Error())
 	}
 
 	return nil

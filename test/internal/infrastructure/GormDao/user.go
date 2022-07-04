@@ -1,4 +1,4 @@
-package GromDao
+package GormDao
 
 import (
 	"github.com/xylong/bingo/test/internal/domain/model/repository"
@@ -16,6 +16,11 @@ func NewUserDao(db *gorm.DB) *UserDao {
 }
 
 // GetByID 根据主键🆔获取
-func (r *UserDao) GetByID(model repository.IModel) error {
-	return r.db.First(model, model.(*user.User).ID).Error
+func (dao *UserDao) GetByID(model repository.IModel) error {
+	return dao.db.First(model, model.(*user.User).ID).Error
+}
+
+// Create 创建用户
+func (dao *UserDao) Create(model repository.IModel) error {
+	return dao.db.Create(model).Error
 }

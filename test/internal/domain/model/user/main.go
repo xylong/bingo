@@ -27,9 +27,17 @@ func New(attr ...Attr) *User {
 	return u
 }
 
+func WithID(id int) Attr {
+	return func(user *User) {
+		if id > 0 {
+			user.ID = id
+		}
+	}
+}
+
 func WithRepo(repo repository.IUserRepo) Attr {
 	return func(user *User) {
-		user.repo = repo
+		user.Repo = repo
 	}
 }
 
@@ -45,9 +53,13 @@ type User struct {
 
 	Profile *profile.Profile // has one
 
-	repo repository.IUserRepo `gorm:"-"`
+	Repo repository.IUserRepo `gorm:"-"`
 }
 
 func (u *User) Get() error {
-	return u.repo.GetByID(u)
+	return u.Repo.GetByID(u)
+}
+
+func (u *User) Create() error {
+	return u.Repo.Create(u)
 }
