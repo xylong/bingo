@@ -1,7 +1,6 @@
 package user
 
 import (
-	"github.com/xylong/bingo/test/internal/domain/model/profile"
 	"github.com/xylong/bingo/test/internal/domain/model/repository"
 	"gorm.io/gorm"
 	"time"
@@ -18,9 +17,9 @@ func (a Attrs) apply(user *User) {
 
 func New(attr ...Attr) *User {
 	u := &User{
-		Wechat:  NewWechat(),
-		Info:    NewInfo(),
-		Profile: profile.New(),
+		Wechat: NewWechat(),
+		Info:   NewInfo(),
+		//Profile: profile.New(),
 	}
 
 	Attrs(attr).apply(u)
@@ -51,7 +50,7 @@ type User struct {
 	UpdatedAt time.Time      `json:"updated_at"`
 	DeletedAt gorm.DeletedAt `gorm:"index;->:false;"`
 
-	Profile *profile.Profile // has one
+	//Profile *profile.Profile // has one
 
 	Repo repository.IUserRepo `gorm:"-"`
 }

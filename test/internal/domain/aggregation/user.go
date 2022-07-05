@@ -22,7 +22,7 @@ func NewFrontUserAgg(user *user.User, profile *profile.Profile, userRepo reposit
 	}
 
 	fu := &FrontUserAgg{User: user, Profile: profile, UserRepo: userRepo, ProfileRepo: profileRepo}
-	fu.User.Repo, fu.ProfileRepo = userRepo, profileRepo
+	fu.User.Repo, fu.Profile.Repo = userRepo, profileRepo
 
 	return fu
 }

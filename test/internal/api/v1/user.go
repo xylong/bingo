@@ -40,8 +40,10 @@ func (c *UserController) register(ctx *bingo.Context) (int, string, interface{})
 
 	agg := aggregation.NewFrontUserAgg(u, p, up, pp)
 	if err := agg.CreateUser(); err == nil {
+		tx.Commit()
 		return 0, "", agg.User
 	} else {
+		tx.Rollback()
 		return 400, err.Error(), nil
 	}
 }
@@ -63,7 +65,6 @@ func (c *UserController) me(ctx *bingo.Context) bingo.Json {
 
 	agg := aggregation.NewFrontUserAgg(u, p, up, pp)
 	if err := agg.Get(); err == nil {
-		agg.User.Profile = agg.Profile
 		return agg.User
 	} else {
 		return gin.H{"error": err.Error()}
@@ -85,7 +86,6 @@ func (c *UserController) profile(ctx *bingo.Context) bingo.Json {
 
 	agg := aggregation.NewFrontUserAgg(u, p, up, pp)
 	if err := agg.Get(); err == nil {
-		agg.User.Profile = agg.Profile
 		return agg.User
 	} else {
 		return err
