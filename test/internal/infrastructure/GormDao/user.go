@@ -1,8 +1,8 @@
 package GormDao
 
 import (
-	"github.com/xylong/bingo/test/internal/domain/model/repository"
 	"github.com/xylong/bingo/test/internal/domain/model/user"
+	"github.com/xylong/bingo/test/internal/domain/repository"
 	"gorm.io/gorm"
 )
 

@@ -1,7 +1,7 @@
 package profile
 
 import (
-	"github.com/xylong/bingo/test/internal/domain/model/repository"
+	"github.com/xylong/bingo/test/internal/domain/repository"
 	"time"
 )
 

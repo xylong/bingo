@@ -2,8 +2,8 @@ package aggregation
 
 import (
 	"github.com/xylong/bingo/test/internal/domain/model/profile"
-	"github.com/xylong/bingo/test/internal/domain/model/repository"
 	"github.com/xylong/bingo/test/internal/domain/model/user"
+	repository2 "github.com/xylong/bingo/test/internal/domain/repository"
 	error2 "github.com/xylong/bingo/test/internal/infrastructure/error"
 )
 
@@ -12,11 +12,11 @@ type FrontUserAgg struct {
 	User    *user.User       // 用户基础信息(聚合根)
 	Profile *profile.Profile // 用户资料信息
 
-	UserRepo    repository.IUserRepo    // 仓储
-	ProfileRepo repository.IProfileRepo // 仓储
+	UserRepo    repository2.IUserRepo    // 仓储
+	ProfileRepo repository2.IProfileRepo // 仓储
 }
 
-func NewFrontUserAgg(user *user.User, profile *profile.Profile, userRepo repository.IUserRepo, profileRepo repository.IProfileRepo) *FrontUserAgg {
+func NewFrontUserAgg(user *user.User, profile *profile.Profile, userRepo repository2.IUserRepo, profileRepo repository2.IProfileRepo) *FrontUserAgg {
 	if user == nil {
 		panic("root error: user")
 	}

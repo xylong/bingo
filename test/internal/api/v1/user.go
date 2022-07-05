@@ -4,10 +4,10 @@ import (
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/xylong/bingo"
+	"github.com/xylong/bingo/test/internal/application/dto"
 	"github.com/xylong/bingo/test/internal/domain/aggregation"
 	"github.com/xylong/bingo/test/internal/domain/model/profile"
 	"github.com/xylong/bingo/test/internal/domain/model/user"
-	"github.com/xylong/bingo/test/internal/dto"
 	"github.com/xylong/bingo/test/internal/infrastructure/GormDao"
 	"github.com/xylong/bingo/test/internal/lib/db"
 	"github.com/xylong/bingo/test/internal/middleware"
@@ -26,7 +26,7 @@ func NewUserController() *UserController {
 }
 
 func (c *UserController) register(ctx *bingo.Context) (int, string, interface{}) {
-	form := &dto.RegisterForm{}
+	form := &dto.UserRegister{}
 
 	err := ctx.ShouldBind(form)
 	if err != nil {
@@ -35,7 +35,7 @@ func (c *UserController) register(ctx *bingo.Context) (int, string, interface{})
 
 	tx := db.DB.Begin()
 	up, pp := GormDao.NewUserDao(tx), GormDao.NewProfileDao(tx)
-	u := user.New(user.WithPhone(form.Phone))
+	u := user.New(user.WithPhone(form.Phone), user.WithNickName(form.Nickname))
 	p := profile.New(profile.WithPassword(form.Password))
 
 	agg := aggregation.NewFrontUserAgg(u, p, up, pp)
