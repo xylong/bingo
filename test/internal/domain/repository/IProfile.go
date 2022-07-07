@@ -1,7 +1,7 @@
 package repository
 
-// IProfileRepo 用户信息接口
-type IProfileRepo interface {
+// IProfile 用户信息接口
+type IProfile interface {
 	GetByUser(model IModel) error
 	Create(IModel) error
 }

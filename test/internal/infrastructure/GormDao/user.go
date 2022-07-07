@@ -1,8 +1,8 @@
 package GormDao
 
 import (
-	"github.com/xylong/bingo/test/internal/domain/model/user"
-	"github.com/xylong/bingo/test/internal/domain/repository"
+	. "github.com/xylong/bingo/test/internal/domain/model/user"
+	"github.com/xylong/bingo/test/internal/lib/db"
 	"gorm.io/gorm"
 )
 
@@ -11,16 +11,23 @@ type UserDao struct {
 	db *gorm.DB
 }
 
-func NewUserDao(db *gorm.DB) *UserDao {
-	return &UserDao{db: db}
+func NewUserDao() *UserDao {
+	return &UserDao{db: db.DB}
 }
 
-// GetByID 根据主键🆔获取
-func (dao *UserDao) GetByID(model repository.IModel) error {
-	return dao.db.First(model, model.(*user.User).ID).Error
+// Get 获取用户
+func (dao *UserDao) Get(user *User) error {
+	return dao.db.First(user).Error
+}
+
+// GetByPhone 根据手机号获取用户
+func (dao *UserDao) GetByPhone(phone string) *User {
+	var u *User
+	dao.db.Where("phone=?", phone).First(u)
+	return u
 }
 
 // Create 创建用户
-func (dao *UserDao) Create(model repository.IModel) error {
-	return dao.db.Create(model).Error
+func (dao *UserDao) Create(user *User) error {
+	return dao.db.Create(user).Error
 }

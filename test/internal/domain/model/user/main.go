@@ -6,15 +6,6 @@ import (
 	"time"
 )
 
-type Attr func(user *User)
-type Attrs []Attr
-
-func (a Attrs) apply(user *User) {
-	for _, attr := range a {
-		attr(user)
-	}
-}
-
 func New(attr ...Attr) *User {
 	u := &User{
 		Wechat: NewWechat(),
@@ -24,20 +15,6 @@ func New(attr ...Attr) *User {
 
 	Attrs(attr).apply(u)
 	return u
-}
-
-func WithID(id int) Attr {
-	return func(user *User) {
-		if id > 0 {
-			user.ID = id
-		}
-	}
-}
-
-func WithRepo(repo repository.IUserRepo) Attr {
-	return func(user *User) {
-		user.Repo = repo
-	}
 }
 
 // User 用户
@@ -52,11 +29,11 @@ type User struct {
 
 	//Profile *profile.Profile // has one
 
-	Repo repository.IUserRepo `gorm:"-"`
+	Repo repository.IUser `gorm:"-"`
 }
 
 func (u *User) Get() error {
-	return u.Repo.GetByID(u)
+	return u.Repo.Get(u)
 }
 
 func (u *User) Create() error {
