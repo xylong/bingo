@@ -1,7 +1,6 @@
 package profile
 
 import (
-	"github.com/xylong/bingo/test/internal/domain/repository"
 	"time"
 )
 
@@ -61,11 +60,5 @@ func WithSignature(signature string) Attr {
 		if signature != "" {
 			profile.Signature = signature
 		}
-	}
-}
-
-func WithRepo(repo repository.IProfileRepo) Attr {
-	return func(profile *Profile) {
-		profile.Repo = repo
 	}
 }

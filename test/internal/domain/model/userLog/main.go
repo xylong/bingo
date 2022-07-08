@@ -2,6 +2,10 @@ package userLog
 
 import "time"
 
+const (
+	UserLogCreate = 1
+)
+
 // UserLog 用户日志
 type UserLog struct {
 	ID        int       `json:"id" gorm:"primaryKey;autoIncrement;"`

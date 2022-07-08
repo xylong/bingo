@@ -2,7 +2,7 @@ package GormDao
 
 import (
 	"github.com/xylong/bingo/test/internal/domain/model/profile"
-	"github.com/xylong/bingo/test/internal/domain/repository"
+	"github.com/xylong/bingo/test/internal/domain/model/user"
 	"gorm.io/gorm"
 )
 
@@ -15,12 +15,13 @@ func NewProfileDao(db *gorm.DB) *ProfileDao {
 	return &ProfileDao{db: db}
 }
 
-// GetByUser 根据用户🆔获取
-func (dao *ProfileDao) GetByUser(model repository.IModel) error {
-	return dao.db.Where("user_id=?", model.(*profile.Profile).UserID).First(model).Error
+// GetByUser 根据用户
+func (dao *ProfileDao) GetByUser(user *user.User) (p *profile.Profile, err error) {
+	err = dao.db.Where("user_id=?", user.ID).First(p).Error
+	return
 }
 
 // Create 创建用户信息
-func (dao *ProfileDao) Create(model repository.IModel) error {
-	return dao.db.Create(model).Error
+func (dao *ProfileDao) Create(profile *profile.Profile) error {
+	return dao.db.Create(profile).Error
 }

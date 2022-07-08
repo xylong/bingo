@@ -19,11 +19,9 @@ func init() {
 }
 
 type (
-	Json interface{}
-
 	apiResponder     func(*Context) (int, string, interface{})
 	stringResponder  func(*Context) string
-	jsonResponder    func(*Context) Json
+	jsonResponder    func(*Context) any
 	defaultResponder func(*Context)
 )
 

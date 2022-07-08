@@ -1,7 +1,6 @@
 package profile
 
 import (
-	"github.com/xylong/bingo/test/internal/domain/repository"
 	"time"
 )
 
@@ -17,7 +16,7 @@ type Profile struct {
 	CreatedAt time.Time `json:"created_at"`
 	UpdatedAt time.Time `json:"updated_at"`
 
-	Repo repository.IProfileRepo `gorm:"-"`
+	//Repo repository.IProfileRepo `gorm:"-"`
 }
 
 func New(attr ...Attr) *Profile {
@@ -32,9 +31,9 @@ func (p *Profile) Name() string {
 }
 
 func (p *Profile) Get() error {
-	return p.Repo.GetByUser(p)
+	return nil
 }
 
 func (p *Profile) Create() error {
-	return p.Repo.Create(p)
+	return nil
 }

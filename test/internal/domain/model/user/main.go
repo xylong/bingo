@@ -1,7 +1,6 @@
 package user
 
 import (
-	"github.com/xylong/bingo/test/internal/domain/repository"
 	"gorm.io/gorm"
 	"time"
 )
@@ -29,13 +28,13 @@ type User struct {
 
 	//Profile *profile.Profile // has one
 
-	Repo repository.IUser `gorm:"-"`
+	//Repo repository.IUser `gorm:"-"`
 }
 
 func (u *User) Get() error {
-	return u.Repo.Get(u)
+	return nil
 }
 
 func (u *User) Create() error {
-	return u.Repo.Create(u)
+	return nil
 }

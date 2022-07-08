@@ -33,6 +33,17 @@ func NewMemberByPhone(phone string, userRepo repository.IUser, profileRepo repos
 	}
 }
 
-func (m *Member) Create() {
+// Create 创建用户
+func (m *Member) Create() error {
+	err := m.UserRepo.Create(m.User)
+	if err != nil {
+		return err
+	}
 
+	m.Log = userLog.New(userLog.WithUserID(m.User.ID), userLog.WithType(userLog.UserLogCreate), userLog.WithRemark("新增用户"))
+	return m.LogRepo.Save(m.Log)
+}
+
+func (m *Member) GetLog() []*userLog.UserLog {
+	return nil
 }

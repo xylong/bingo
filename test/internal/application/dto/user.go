@@ -1,5 +1,7 @@
 package dto
 
+import "time"
+
 // 请求对象
 type (
 	// UserRegister 注册表单验证
@@ -42,5 +44,17 @@ type (
 		WechatUnionid        string `json:"wechat_unionid"`
 		WechatAppletOpenid   string `json:"wechat_applet_openid"`
 		WechatOfficialOpenid string `json:"wechat_official_openid"`
+	}
+
+	UserLog struct {
+		ID   int       `json:"id"`
+		Log  string    `json:"log"`
+		Date time.Time `json:"date"`
+	}
+
+	UserInfo struct {
+		ID       int    `json:"id"`
+		Nickname string `json:"nickname"`
+		Logs     []*UserLog
 	}
 )

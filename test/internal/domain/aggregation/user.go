@@ -12,17 +12,16 @@ type FrontUserAgg struct {
 	User    *user.User       // 用户基础信息(聚合根)
 	Profile *profile.Profile // 用户资料信息
 
-	UserRepo    repository2.IUserRepo    // 仓储
-	ProfileRepo repository2.IProfileRepo // 仓储
+	UserRepo    repository2.IUser    // 仓储
+	ProfileRepo repository2.IProfile // 仓储
 }
 
-func NewFrontUserAgg(user *user.User, profile *profile.Profile, userRepo repository2.IUserRepo, profileRepo repository2.IProfileRepo) *FrontUserAgg {
+func NewFrontUserAgg(user *user.User, profile *profile.Profile, userRepo repository2.IUser, profileRepo repository2.IProfile) *FrontUserAgg {
 	if user == nil {
 		panic("root error: user")
 	}
 
 	fu := &FrontUserAgg{User: user, Profile: profile, UserRepo: userRepo, ProfileRepo: profileRepo}
-	fu.User.Repo, fu.Profile.Repo = userRepo, profileRepo
 
 	return fu
 }
