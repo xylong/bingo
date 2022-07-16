@@ -25,6 +25,12 @@ func (s *UserService) Find() *user.User {
 }
 
 func (s *UserService) GetSimpleUser(req *dto.SimpleUserReq) *dto.SimpleUser {
+	return &dto.SimpleUser{
+		ID:       1,
+		Avatar:   "aaa",
+		Nickname: "bbb",
+		Email:    "ccc",
+	}
 	u := s.Req.D2M_User(req)
 	_ = s.ud.Get(u)
 	return s.Rep.M2D_SimpleUser(u)

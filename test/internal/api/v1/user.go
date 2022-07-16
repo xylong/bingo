@@ -5,6 +5,7 @@ import (
 	"github.com/xylong/bingo"
 	"github.com/xylong/bingo/test/internal/application/dto"
 	"github.com/xylong/bingo/test/internal/application/service"
+	"github.com/xylong/bingo/test/internal/infrastructure/utils"
 	"github.com/xylong/bingo/test/internal/middleware"
 )
 
@@ -21,8 +22,8 @@ func NewUserController() *UserController {
 	return &UserController{}
 }
 
-func (c *UserController) register(ctx *bingo.Context) (int, string, interface{}) {
-	return 0, "", nil
+func (c *UserController) smsRegister(ctx *bingo.Context) interface{} {
+	return "a"
 }
 
 func (c *UserController) login(ctx *bingo.Context) string {
@@ -34,7 +35,7 @@ func (c *UserController) logout(ctx *bingo.Context) {
 }
 
 func (c *UserController) me(ctx *bingo.Context) any {
-	return nil
+	return "b"
 }
 
 func (c *UserController) update(ctx *bingo.Context) string {
@@ -42,12 +43,9 @@ func (c *UserController) update(ctx *bingo.Context) string {
 }
 
 func (c *UserController) show(ctx *bingo.Context) any {
-	param := &dto.SimpleUserReq{}
-	if err := ctx.ShouldBindUri(param); err != nil {
-		return nil
-	}
-
-	return c.service.GetSimpleUser(param)
+	return c.service.GetSimpleUser(
+		utils.Exec(ctx.ShouldBindUri, &dto.SimpleUserReq{}).
+			Unwrap().(*dto.SimpleUserReq))
 }
 
 func (c *UserController) Route(group *bingo.Group) {
@@ -57,7 +55,7 @@ func (c *UserController) Route(group *bingo.Group) {
 		users.GET("users/:id", c.show)
 	}, middleware.NewAuthorization())
 
-	group.POST("register", c.register)
+	group.POST("register", c.smsRegister)
 	group.POST("login", c.login)
 	group.DELETE("logout", c.logout)
 }

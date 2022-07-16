@@ -4,11 +4,18 @@ import "time"
 
 // 请求对象
 type (
-	// UserRegister 注册表单验证
-	UserRegister struct {
-		Nickname string `json:"nickname" form:"nickname" binding:"required,min=2,max=10"`
-		Phone    string `json:"phone" form:"phone" binding:"required"`
-		Password string `json:"password" form:"password" binding:"required,min=6,max=18"`
+	// SmsRegister 短信注册
+	SmsRegister struct {
+		Phone    string `json:"phone" form:"phone" binding:"required"`        // 手机号
+		Code     int32  `json:"code" form:"code" binding:"required"`          // 短信验证码
+		Nickname string `json:"nickname" form:"nickname" binding:"omitempty"` // 昵称
+	}
+
+	// EmailRegister 邮箱注册
+	EmailRegister struct {
+		Email    string `json:"email" form:"email" binding:"required,email"`              // 邮箱
+		Password string `json:"password" form:"password" binding:"required,min=6,max=18"` // 密码
+		Nickname string `json:"nickname" form:"nickname" binding:"omitempty"`             // 昵称
 	}
 
 	// SimpleUserReq 简单用户请求参数

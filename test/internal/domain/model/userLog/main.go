@@ -3,7 +3,9 @@ package userLog
 import "time"
 
 const (
-	UserLogCreate = 1
+	Register = iota // 注册
+	Login           // 登录
+	Logout          // 登出
 )
 
 // UserLog 用户日志

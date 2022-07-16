@@ -40,7 +40,7 @@ func (m *Member) Create() error {
 		return err
 	}
 
-	m.Log = userLog.New(userLog.WithUserID(m.User.ID), userLog.WithType(userLog.UserLogCreate), userLog.WithRemark("新增用户"))
+	m.Log = userLog.New(userLog.WithUserID(m.User.ID), userLog.WithType(userLog.Register), userLog.WithRemark("新增用户"))
 	return m.LogRepo.Save(m.Log)
 }
 
