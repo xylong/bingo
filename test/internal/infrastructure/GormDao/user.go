@@ -2,7 +2,6 @@ package GormDao
 
 import (
 	. "github.com/xylong/bingo/test/internal/domain/model/user"
-	"github.com/xylong/bingo/test/internal/lib/db"
 	"gorm.io/gorm"
 )
 
@@ -11,8 +10,8 @@ type UserDao struct {
 	db *gorm.DB
 }
 
-func NewUserDao() *UserDao {
-	return &UserDao{db: db.DB}
+func NewUserDao(db *gorm.DB) *UserDao {
+	return &UserDao{db: db}
 }
 
 // Get 获取用户

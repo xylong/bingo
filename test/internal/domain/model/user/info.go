@@ -11,35 +11,3 @@ type Info struct {
 func NewInfo() *Info {
 	return &Info{}
 }
-
-func WithAvatar(avatar string) Attr {
-	return func(user *User) {
-		if avatar != "" {
-			user.Avatar = avatar
-		}
-	}
-}
-
-func WithNickName(name string) Attr {
-	return func(user *User) {
-		if name != "" {
-			user.Nickname = name
-		}
-	}
-}
-
-func WithPhone(phone string) Attr {
-	return func(user *User) {
-		if phone != "" {
-			user.Phone = phone
-		}
-	}
-}
-
-func WithEmail(email string) Attr {
-	return func(user *User) {
-		if email != "" {
-			user.Email = email
-		}
-	}
-}

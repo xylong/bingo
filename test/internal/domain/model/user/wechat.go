@@ -10,27 +10,3 @@ type Wechat struct {
 func NewWechat() *Wechat {
 	return &Wechat{}
 }
-
-func WithUnionid(unionid string) Attr {
-	return func(user *User) {
-		if unionid != "" {
-			user.WechatUnionid = unionid
-		}
-	}
-}
-
-func WithAppletOpenid(openid string) Attr {
-	return func(user *User) {
-		if openid != "" {
-			user.WechatAppletOpenid = openid
-		}
-	}
-}
-
-func WithOfficialOpenid(openid string) Attr {
-	return func(user *User) {
-		if openid != "" {
-			user.WechatOfficialOpenid = openid
-		}
-	}
-}

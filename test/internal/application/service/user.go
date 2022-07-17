@@ -4,19 +4,26 @@ import (
 	"github.com/xylong/bingo/test/internal/application/assembler"
 	"github.com/xylong/bingo/test/internal/application/dto"
 	"github.com/xylong/bingo/test/internal/domain/model/user"
+	"github.com/xylong/bingo/test/internal/domain/repository"
 	"github.com/xylong/bingo/test/internal/infrastructure/GormDao"
+	"github.com/xylong/bingo/test/internal/lib/db"
 )
 
 // UserService 用户服务
 type UserService struct {
-	ud  *GormDao.UserDao
 	Req *assembler.UserReq
 	Rep *assembler.UserRep
+
+	UserDao repository.IUser
+}
+
+func NewUserService() *UserService {
+	return &UserService{Req: &assembler.UserReq{}, Rep: &assembler.UserRep{}, UserDao: GormDao.NewUserDao(db.DB)}
 }
 
 func (s *UserService) Find() *user.User {
 	u := user.New(user.WithID(1))
-	err := s.ud.Get(u)
+	err := s.UserDao.Get(u)
 	if err == nil {
 		return u
 	}
@@ -25,13 +32,7 @@ func (s *UserService) Find() *user.User {
 }
 
 func (s *UserService) GetSimpleUser(req *dto.SimpleUserReq) *dto.SimpleUser {
-	return &dto.SimpleUser{
-		ID:       1,
-		Avatar:   "aaa",
-		Nickname: "bbb",
-		Email:    "ccc",
-	}
 	u := s.Req.D2M_User(req)
-	_ = s.ud.Get(u)
+	_ = s.UserDao.Get(u)
 	return s.Rep.M2D_SimpleUser(u)
 }

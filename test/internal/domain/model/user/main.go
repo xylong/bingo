@@ -1,6 +1,7 @@
 package user
 
 import (
+	"github.com/xylong/bingo/test/internal/domain/model"
 	"gorm.io/gorm"
 	"time"
 )
@@ -18,9 +19,11 @@ func New(attr ...Attr) *User {
 
 // User 用户
 type User struct {
-	ID      int `gorm:"primaryKey;autoIncrement;" xorm:"'id' int(11) pk autoincr notnull" json:"id"`
-	*Wechat     // 微信信息
-	*Info       // 用户信息
+	*model.Model `gorm:"-"`
+
+	ID      int               `gorm:"primaryKey;autoIncrement;" xorm:"'id' int(11) pk autoincr notnull" json:"id"`
+	*Wechat `gorm:"embedded"` // 微信信息
+	*Info   `gorm:"embedded"` // 用户信息
 
 	CreatedAt time.Time      `json:"created_at"`
 	UpdatedAt time.Time      `json:"updated_at"`
@@ -28,7 +31,7 @@ type User struct {
 
 	//Profile *profile.Profile // has one
 
-	//Repo repository.IUser `gorm:"-"`
+	//Dao repository.IUser `gorm:"-"`
 }
 
 func (u *User) Get() error {

@@ -12,9 +12,5 @@ type UserReq struct {
 }
 
 func (r *UserReq) D2M_User(req *dto.SimpleUserReq) *user.User {
-	if err := r.v.Struct(req); err != nil {
-		panic(err.Error())
-	}
-
 	return user.New(user.WithID(req.ID))
 }

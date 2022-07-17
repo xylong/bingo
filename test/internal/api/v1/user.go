@@ -19,7 +19,9 @@ type UserController struct {
 }
 
 func NewUserController() *UserController {
-	return &UserController{}
+	return &UserController{
+		service: service.NewUserService(),
+	}
 }
 
 func (c *UserController) smsRegister(ctx *bingo.Context) interface{} {
