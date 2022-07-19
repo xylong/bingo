@@ -1,74 +1,67 @@
 package user
 
-type Attr func(user *User)
-type Attrs []Attr
+import "github.com/xylong/bingo/test/internal/domain"
 
-func (a Attrs) apply(user *User) {
-	for _, attr := range a {
-		attr(user)
-	}
-}
-
-func WithID(id int) Attr {
-	return func(user *User) {
+func WithID(id int) domain.Attr {
+	return func(i interface{}) {
 		if id > 0 {
-			user.ID = id
+			i.(*User).ID = id
 		}
 	}
 }
 
-func WithUnionid(unionid string) Attr {
-	return func(user *User) {
+func WithUnionid(unionid string) domain.Attr {
+	return func(i interface{}) {
 		if unionid != "" {
-			user.WechatUnionid = unionid
+			i.(*User).WechatUnionid = unionid
 		}
 	}
 }
 
-func WithAppletOpenid(openid string) Attr {
-	return func(user *User) {
+func WithAppletOpenid(openid string) domain.Attr {
+	return func(i interface{}) {
 		if openid != "" {
-			user.WechatAppletOpenid = openid
+			i.(*User).WechatAppletOpenid = openid
 		}
 	}
 }
 
-func WithOfficialOpenid(openid string) Attr {
-	return func(user *User) {
+func WithOfficialOpenid(openid string) domain.Attr {
+	return func(i interface{}) {
 		if openid != "" {
-			user.WechatOfficialOpenid = openid
+			i.(*User).WechatOfficialOpenid = openid
 		}
 	}
 }
 
-func WithAvatar(avatar string) Attr {
-	return func(user *User) {
+func WithAvatar(avatar string) domain.Attr {
+	return func(i interface{}) {
 		if avatar != "" {
-			user.Avatar = avatar
+			i.(*User).Avatar = avatar
 		}
 	}
 }
 
-func WithNickName(name string) Attr {
-	return func(user *User) {
+func WithNickName(name string) domain.Attr {
+	return func(i interface{}) {
 		if name != "" {
-			user.Nickname = name
+			i.(*User).Nickname = name
 		}
 	}
 }
 
-func WithPhone(phone string) Attr {
-	return func(user *User) {
+func WithPhone(phone string) domain.Attr {
+	return func(i interface{}) {
 		if phone != "" {
-			user.Phone = phone
+			i.(*User).Phone = phone
 		}
 	}
 }
 
-func WithEmail(email string) Attr {
-	return func(user *User) {
+func WithEmail(email string) domain.Attr {
+	return func(i interface{}) {
 		if email != "" {
-			user.Email = email
+			i.(*User).Email = email
 		}
 	}
 }

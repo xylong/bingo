@@ -43,14 +43,14 @@ func WithBirthday(birthday string) Attr {
 
 func WithGender(gender int) Attr {
 	return func(profile *Profile) {
-		profile.Gender = gender
+		profile.Gender = int8(gender)
 	}
 }
 
 func WithLevel(level int) Attr {
 	return func(profile *Profile) {
 		if level >= 0 {
-			profile.Level = level
+			profile.Level = int8(level)
 		}
 	}
 }

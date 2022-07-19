@@ -1,21 +1,12 @@
 package user
 
 import (
+	"github.com/xylong/bingo/test/internal/domain"
 	"github.com/xylong/bingo/test/internal/domain/model"
+	"github.com/xylong/bingo/test/internal/domain/repository"
 	"gorm.io/gorm"
 	"time"
 )
-
-func New(attr ...Attr) *User {
-	u := &User{
-		Wechat: NewWechat(),
-		Info:   NewInfo(),
-		//Profile: profile.New(),
-	}
-
-	Attrs(attr).apply(u)
-	return u
-}
 
 // User 用户
 type User struct {
@@ -31,7 +22,18 @@ type User struct {
 
 	//Profile *profile.Profile // has one
 
-	//Dao repository.IUser `gorm:"-"`
+	Dao repository.IUser `gorm:"-"`
+}
+
+func New(attr ...domain.Attr) *User {
+	user := &User{
+		Wechat: NewWechat(),
+		Info:   NewInfo(),
+	}
+
+	domain.Attrs(attr).Apply(user)
+
+	return user
 }
 
 func (u *User) Get() error {

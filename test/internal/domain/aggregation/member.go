@@ -1,6 +1,7 @@
 package aggregation
 
 import (
+	"github.com/xylong/bingo/test/internal/domain"
 	"github.com/xylong/bingo/test/internal/domain/model/profile"
 	"github.com/xylong/bingo/test/internal/domain/model/user"
 	"github.com/xylong/bingo/test/internal/domain/model/userLog"
@@ -19,17 +20,32 @@ type Member struct {
 	LogRepo     repository.IUserLog
 }
 
-func NewMember(user *user.User, profile *profile.Profile, userRepo repository.IUser, profileRepo repository.IProfile, logRepo repository.IUserLog) *Member {
-	return &Member{User: user, Profile: profile, UserRepo: userRepo, ProfileRepo: profileRepo, LogRepo: logRepo}
+func NewMember(attr ...domain.Attr) *Member {
+	member := &Member{}
+	domain.Attrs(attr).Apply(member)
+
+	return member
 }
 
-func NewMemberByPhone(phone string, userRepo repository.IUser, profileRepo repository.IProfile) *Member {
-	u := userRepo.GetByPhone(phone)
+func WithUser(u *user.User) domain.Attr {
+	return func(i interface{}) {
+		if u != nil {
+			i.(*Member).User = u
+		}
+	}
+}
 
-	return &Member{
-		User:        u,
-		UserRepo:    userRepo,
-		ProfileRepo: profileRepo,
+func WithUserRepo(iUser repository.IUser) domain.Attr {
+	return func(i interface{}) {
+		if iUser != nil {
+			i.(*Member).UserRepo = iUser
+		}
+	}
+}
+
+func WIthProfileRepo(iProfile repository.IProfile) domain.Attr {
+	return func(i interface{}) {
+		i.(*Member).ProfileRepo = iProfile
 	}
 }
 
