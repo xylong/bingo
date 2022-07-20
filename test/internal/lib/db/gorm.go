@@ -36,5 +36,10 @@ func init() {
 		panic(err)
 	}
 
+	sqlDB, _ := db.DB()
+	sqlDB.SetMaxIdleConns(10)
+	sqlDB.SetMaxOpenConns(20)
+	sqlDB.SetConnMaxLifetime(time.Second * 10)
+
 	DB = db
 }
