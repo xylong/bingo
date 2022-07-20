@@ -17,18 +17,24 @@ func _() {
 	_ = x[TokenInvalid-1005]
 	_ = x[ZeroIEntityD-10001]
 	_ = x[NotFoundData-10002]
+	_ = x[InsertError-10003]
+	_ = x[CreateUserError-20101]
+	_ = x[CreateProfileError-20102]
+	_ = x[CreateUserLogError-20103]
 }
 
 const (
 	_Code_name_0 = "OK"
 	_Code_name_1 = "ParamError"
 	_Code_name_2 = "未授权令牌格式错误令牌签名验证失败令牌过期无效令牌"
-	_Code_name_3 = "没有根实体🆔未找到数据"
+	_Code_name_3 = "没有实体🆔未找到数据数据创建错误"
+	_Code_name_4 = "用户创建失败用户信息信息创建失败用户日志创建失败"
 )
 
 var (
 	_Code_index_2 = [...]uint8{0, 9, 27, 51, 63, 75}
-	_Code_index_3 = [...]uint8{0, 19, 34}
+	_Code_index_3 = [...]uint8{0, 16, 31, 49}
+	_Code_index_4 = [...]uint8{0, 18, 48, 72}
 )
 
 func (i Code) String() string {
@@ -40,9 +46,12 @@ func (i Code) String() string {
 	case 1001 <= i && i <= 1005:
 		i -= 1001
 		return _Code_name_2[_Code_index_2[i]:_Code_index_2[i+1]]
-	case 10001 <= i && i <= 10002:
+	case 10001 <= i && i <= 10003:
 		i -= 10001
 		return _Code_name_3[_Code_index_3[i]:_Code_index_3[i+1]]
+	case 20101 <= i && i <= 20103:
+		i -= 20101
+		return _Code_name_4[_Code_index_4[i]:_Code_index_4[i+1]]
 	default:
 		return "Code(" + strconv.FormatInt(int64(i), 10) + ")"
 	}

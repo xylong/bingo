@@ -6,6 +6,7 @@ import (
 	"github.com/xylong/bingo/test/internal/domain/model/user"
 	"github.com/xylong/bingo/test/internal/domain/model/userLog"
 	"github.com/xylong/bingo/test/internal/domain/repository"
+	. "github.com/xylong/bingo/test/internal/infrastructure/error"
 )
 
 // Member 会员
@@ -72,16 +73,16 @@ func WIthProfileRepo(iProfile repository.Profiler) domain.Attr {
 // Create 创建用户
 func (m *Member) Create() error {
 	if err := m.User.Create(); err != nil {
-		return err
+		return NewOperatorError(CreateUserError)
 	}
 
 	if err := m.Profile.Create(); err != nil {
-		return err
+		return NewOperatorError(CreateProfileError)
 	}
 
 	m.Log = userLog.New(userLog.WithUserID(m.User.ID), userLog.WithType(userLog.Register), userLog.WithRemark("新增用户"))
 	if err := m.Log.Create(); err != nil {
-		return err
+		return NewOperatorError(CreateUserLogError)
 	}
 
 	return nil

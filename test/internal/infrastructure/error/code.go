@@ -17,4 +17,8 @@ const (
 	ZeroIEntityD Code = 10001 // 没有实体🆔
 	NotFoundData Code = 10002 // 未找到数据
 	InsertError  Code = 10003 // 数据创建错误
+
+	CreateUserError    Code = 20101 // 用户创建失败
+	CreateProfileError Code = 20102 // 用户信息信息创建失败
+	CreateUserLogError Code = 20103 // 用户日志创建失败
 )
