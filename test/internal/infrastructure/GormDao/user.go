@@ -1,7 +1,7 @@
 package GormDao
 
 import (
-	. "github.com/xylong/bingo/test/internal/domain/model/user"
+	"github.com/xylong/bingo/test/internal/domain/repository"
 	"gorm.io/gorm"
 )
 
@@ -15,6 +15,6 @@ func NewUserDao(db *gorm.DB) *UserDao {
 }
 
 // Create 创建用户
-func (dao *UserDao) Create(user *User) error {
-	return dao.db.Create(user).Error
+func (dao *UserDao) Create(modeler repository.Modeler) error {
+	return dao.db.Create(modeler).Error
 }

@@ -2,7 +2,10 @@ package profile
 
 import (
 	"fmt"
+	"github.com/xylong/bingo/test/internal/domain"
 	"github.com/xylong/bingo/test/internal/domain/model"
+	"github.com/xylong/bingo/test/internal/domain/repository"
+	"github.com/xylong/bingo/test/internal/infrastructure/utils"
 	"gorm.io/gorm"
 	"time"
 )
@@ -27,19 +30,25 @@ type Profile struct {
 	UpdatedAt time.Time `json:"updated_at"`
 
 	*model.Model `gorm:"-"`
-	//Repo repository.IProfileRepo `gorm:"-"`
+
+	Dao repository.Profiler `gorm:"-"`
 }
 
-func New(attr ...Attr) *Profile {
+func New(attr ...domain.Attr) *Profile {
 	p := &Profile{}
 	p.Model = model.NewModel(p)
-	Attrs(attr).apply(p)
+	domain.Attrs(attr).Apply(p)
 
 	return p
 }
 
-func (p *Profile) Name() string {
-	return "profile"
+func (p *Profile) TableName() string {
+	return "profiles"
+}
+
+func (p *Profile) BeforeCreate(db *gorm.DB) error {
+	p.Salt = utils.RandString(6)
+	return nil
 }
 
 func (p *Profile) Get() error {
@@ -49,7 +58,7 @@ func (p *Profile) Get() error {
 }
 
 func (p *Profile) Create() error {
-	return nil
+	return p.Dao.Create(p)
 }
 
 // UserID 根据用户🆔筛选

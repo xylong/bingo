@@ -1,6 +1,10 @@
 package userLog
 
-import "time"
+import (
+	"github.com/xylong/bingo/test/internal/domain"
+	"github.com/xylong/bingo/test/internal/domain/repository"
+	"time"
+)
 
 const (
 	Register = iota // 注册
@@ -15,11 +19,21 @@ type UserLog struct {
 	Type      uint8     `json:"type" gorm:"type:tinyint(1);not null;comment:日志类型"`
 	Remark    string    `json:"remark" gorm:"type:varchar(100);comment:描述"`
 	CreatedAt time.Time `json:"created_at"`
+
+	Dao repository.UserLogger `gorm:"-"`
 }
 
-func New(attr ...Attr) *UserLog {
+func New(attr ...domain.Attr) *UserLog {
 	log := &UserLog{}
-	Attrs(attr).apply(log)
+	domain.Attrs(attr).Apply(log)
 
 	return log
+}
+
+func (l *UserLog) TableName() string {
+	return "user_logs"
+}
+
+func (l *UserLog) Create() error {
+	return l.Dao.Create(l)
 }

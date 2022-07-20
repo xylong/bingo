@@ -1,34 +1,25 @@
 package userLog
 
-type (
-	Attrs []Attr
-	Attr  func(*UserLog)
-)
+import "github.com/xylong/bingo/test/internal/domain"
 
-func (a Attrs) apply(log *UserLog) {
-	for _, attr := range a {
-		attr(log)
-	}
-}
-
-func WithUserID(uid int) Attr {
-	return func(log *UserLog) {
+func WithUserID(uid int) domain.Attr {
+	return func(m interface{}) {
 		if uid > 0 {
-			log.UserID = uid
+			m.(*UserLog).UserID = uid
 		}
 	}
 }
 
-func WithType(t uint8) Attr {
-	return func(log *UserLog) {
-		log.Type = t
+func WithType(t uint8) domain.Attr {
+	return func(m interface{}) {
+		m.(*UserLog).Type = t
 	}
 }
 
-func WithRemark(remark string) Attr {
-	return func(log *UserLog) {
+func WithRemark(remark string) domain.Attr {
+	return func(m interface{}) {
 		if remark != "" {
-			log.Remark = remark
+			m.(*UserLog).Remark = remark
 		}
 	}
 }

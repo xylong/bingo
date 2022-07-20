@@ -36,10 +36,10 @@ func New(attr ...domain.Attr) *User {
 	return user
 }
 
-func (u *User) Get() error {
-	return nil
+func (u *User) TableName() string {
+	return "users"
 }
 
 func (u *User) Create() error {
-	return nil
+	return u.Dao.Create(u)
 }
