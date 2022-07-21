@@ -5,6 +5,7 @@ import (
 	"github.com/xylong/bingo/test/internal/domain/model"
 	"github.com/xylong/bingo/test/internal/domain/repository"
 	"gorm.io/gorm"
+	"strings"
 	"time"
 )
 
@@ -42,4 +43,11 @@ func (u *User) TableName() string {
 
 func (u *User) Create() error {
 	return u.Dao.Create(u)
+}
+
+// HidePhone 隐藏手机号
+func (u *User) HidePhone() {
+	if u.Phone != "" {
+		u.Phone = strings.Join([]string{u.Phone[0:3], "****", u.Phone[7:]}, "")
+	}
 }

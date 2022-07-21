@@ -22,6 +22,17 @@ type (
 	SimpleUserReq struct {
 		ID int `uri:"id" binding:"required,gt=0"`
 	}
+
+	// UserReq 用户查询
+	UserReq struct {
+		*Pagination
+		Phone    string `json:"phone" form:"phone"`                                       // 手机号
+		Email    string `json:"email" form:"email" binding:"omitempty,email"`             // 邮箱
+		Nickname string `json:"nickname" form:"nickname" binding:"omitempty"`             // 昵称
+		Age      uint8  `json:"age" form:"age" binding:"omitempty,gte=1,lte=100"`         // 年龄
+		Gender   int8   `json:"gender" form:"gender" binding:"omitempty,oneof=-1 0 1"`    // 性别
+		Level    uint8  `json:"level" form:"level" binding:"omitempty,oneof=1 2 3 4 5 6"` // 等级
+	}
 )
 
 // 响应对象

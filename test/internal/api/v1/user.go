@@ -55,6 +55,15 @@ func (c *UserController) show(ctx *bingo.Context) any {
 			Unwrap().(*dto.SimpleUserReq))
 }
 
+func (c *UserController) index(ctx *bingo.Context) (int, string, interface{}) {
+	req := &dto.UserReq{}
+	if err := ctx.ShouldBind(req); err != nil {
+		return 400, err.Error(), nil
+	}
+
+	return 0, "", req
+}
+
 func (c *UserController) Route(group *bingo.Group) {
 	group.Group("", func(users *bingo.Group) {
 		users.GET("me", c.me)
@@ -65,4 +74,7 @@ func (c *UserController) Route(group *bingo.Group) {
 	group.POST("register", c.smsRegister)
 	group.POST("login", c.login)
 	group.DELETE("logout", c.logout)
+
+	group.GET("users", c.index)
+
 }

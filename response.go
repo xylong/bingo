@@ -29,11 +29,17 @@ func (r apiResponder) Return() gin.HandlerFunc {
 	return func(context *gin.Context) {
 		code, message, data := r(NewContext(context))
 
-		context.JSON(http.StatusOK, gin.H{
+		echo := gin.H{
 			"code":    code,
 			"message": message,
 			"data":    data,
-		})
+		}
+
+		if code == 0 {
+			context.JSON(http.StatusOK, echo)
+		} else {
+			context.AbortWithStatusJSON(http.StatusBadRequest, echo)
+		}
 	}
 }
 
