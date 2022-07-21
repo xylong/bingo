@@ -12,7 +12,7 @@ func (e *NotFoundError) Error() string {
 
 func NewNotFoundError(code Code, message ...string) *NotFoundError {
 	if len(message) == 0 {
-		message[0] = code.String()
+		message = append(message, code.String())
 	}
 
 	return &NotFoundError{Code: code, Message: message[0]}

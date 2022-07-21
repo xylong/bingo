@@ -1,6 +1,8 @@
 package error
 
-import "fmt"
+import (
+	"strings"
+)
 
 // OperatorError 操作错误
 type OperatorError struct {
@@ -14,15 +16,21 @@ func (e *OperatorError) Error() string {
 
 func NewOperatorError(code Code, message ...string) *OperatorError {
 	if len(message) == 0 {
-		message[0] = code.String()
+		message = append(message, code.String())
 	}
 
 	return &OperatorError{Code: code, Message: message[0]}
 }
 
 func NewCreateError(model, msg string) *OperatorError {
+	builder := strings.Builder{}
+	builder.WriteString("model:")
+	builder.WriteString(model)
+	builder.WriteString(" create error:")
+	builder.WriteString(msg)
+
 	return &OperatorError{
 		Code:    InsertError,
-		Message: fmt.Sprintf("model %s create error:%s", model, msg),
+		Message: builder.String(),
 	}
 }

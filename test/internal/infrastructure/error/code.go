@@ -1,8 +1,7 @@
-//go:generate stringer -type Code -linecomment
 package error
 
-// Code 错误吗
-type Code int32
+//go:generate stringer -type Code -linecomment
+type Code uint16
 
 const (
 	OK         Code = 0
