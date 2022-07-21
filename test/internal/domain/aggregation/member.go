@@ -64,9 +64,17 @@ func WithProfile(p *profile.Profile) domain.Attr {
 	}
 }
 
-func WIthProfileRepo(iProfile repository.Profiler) domain.Attr {
+func WithProfileRepo(iProfile repository.Profiler) domain.Attr {
 	return func(i interface{}) {
 		i.(*Member).ProfileRepo = iProfile
+	}
+}
+
+func WithLogRepo(logger repository.UserLogger) domain.Attr {
+	return func(i interface{}) {
+		if logger != nil {
+			i.(*Member).LogRepo = logger
+		}
 	}
 }
 
@@ -76,11 +84,13 @@ func (m *Member) Create() error {
 		return NewOperatorError(CreateUserError)
 	}
 
+	m.Profile.UserID = m.User.ID
 	if err := m.Profile.Create(); err != nil {
 		return NewOperatorError(CreateProfileError)
 	}
 
 	m.Log = userLog.New(userLog.WithUserID(m.User.ID), userLog.WithType(userLog.Register), userLog.WithRemark("新增用户"))
+	m.Log.Dao = m.LogRepo
 	if err := m.Log.Create(); err != nil {
 		return NewOperatorError(CreateUserLogError)
 	}

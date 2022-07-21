@@ -42,7 +42,8 @@ func (s *UserService) Create(register *dto.SmsRegister) interface{} {
 
 	member := aggregation.NewMember(
 		aggregation.WithUser(u), aggregation.WithUserRepo(ud),
-		aggregation.WithProfile(p), aggregation.WIthProfileRepo(pd),
+		aggregation.WithProfile(p), aggregation.WithProfileRepo(pd),
+		aggregation.WithLogRepo(GormDao.NewUserLogDao(tx)),
 	)
 	if err := member.Create(); err != nil {
 		tx.Rollback()
