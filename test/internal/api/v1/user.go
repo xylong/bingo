@@ -61,7 +61,7 @@ func (c *UserController) index(ctx *bingo.Context) (int, string, interface{}) {
 		return 400, err.Error(), nil
 	}
 
-	return 0, "", req
+	return c.service.GetList(req)
 }
 
 func (c *UserController) Route(group *bingo.Group) {

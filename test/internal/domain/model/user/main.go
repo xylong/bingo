@@ -45,6 +45,12 @@ func (u *User) Create() error {
 	return u.Dao.Create(u)
 }
 
+func (u *User) Get() ([]*User, int64, error) {
+	var users []*User
+	total, err := u.Dao.Get(&users)
+	return users, total, err
+}
+
 // HidePhone 隐藏手机号
 func (u *User) HidePhone() {
 	if u.Phone != "" {

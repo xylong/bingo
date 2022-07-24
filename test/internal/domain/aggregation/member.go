@@ -25,7 +25,7 @@ func NewMember(attr ...domain.Attr) *Member {
 	member := &Member{}
 	domain.Attrs(attr).Apply(member)
 
-	if member.User != nil && member.Profile != nil {
+	if member.User != nil && member.UserRepo != nil {
 		member.User.Dao = member.UserRepo
 	}
 
@@ -96,6 +96,10 @@ func (m *Member) Create() error {
 	}
 
 	return nil
+}
+
+func (m *Member) GetUsers() ([]*user.User, int64, error) {
+	return m.User.Get()
 }
 
 func (m *Member) GetLog() []*userLog.UserLog {

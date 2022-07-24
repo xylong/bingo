@@ -15,6 +15,11 @@ func NewUserDao(db *gorm.DB) *UserDao {
 }
 
 // Create 创建用户
-func (dao *UserDao) Create(modeler repository.Modeler) error {
-	return dao.db.Create(modeler).Error
+func (u *UserDao) Create(modeler repository.Modeler) error {
+	return u.db.Create(modeler).Error
+}
+
+func (u *UserDao) Get(users interface{}) (total int64, err error) {
+	err = u.db.Find(users).Count(&total).Error
+	return
 }

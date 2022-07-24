@@ -53,3 +53,15 @@ func (s *UserService) Create(register *dto.SmsRegister) interface{} {
 		return nil
 	}
 }
+
+func (s *UserService) GetList(req *dto.UserReq) (int, string, interface{}) {
+	users, total, _ := aggregation.NewMember(
+		aggregation.WithUser(user.New()),
+		aggregation.WithUserRepo(GormDao.NewUserDao(db.DB)),
+	).GetUsers()
+
+	return 0, "", map[string]interface{}{
+		"list":  users,
+		"total": total,
+	}
+}
