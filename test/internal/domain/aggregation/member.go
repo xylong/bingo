@@ -1,6 +1,7 @@
 package aggregation
 
 import (
+	"github.com/xylong/bingo/test/internal/application/dto"
 	"github.com/xylong/bingo/test/internal/domain"
 	"github.com/xylong/bingo/test/internal/domain/model/profile"
 	"github.com/xylong/bingo/test/internal/domain/model/user"
@@ -98,8 +99,8 @@ func (m *Member) Create() error {
 	return nil
 }
 
-func (m *Member) GetUsers() ([]*user.User, int64, error) {
-	return m.User.Get()
+func (m *Member) GetUsers(req *dto.UserReq) ([]*user.User, int64, error) {
+	return m.User.Get(req)
 }
 
 func (m *Member) GetLog() []*userLog.UserLog {

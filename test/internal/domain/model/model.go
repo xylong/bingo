@@ -1,6 +1,7 @@
 package model
 
 import (
+	"github.com/xylong/bingo/test/internal/infrastructure/GormDao"
 	"github.com/xylong/bingo/test/internal/lib/db"
 	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
@@ -22,8 +23,8 @@ func NewModel(data interface{}) *Model {
 }
 
 // Compare 字段过滤
-func (*Model) Compare(field string, value interface{}, comparator int) Scope {
-	return Compare(field, value, comparator)
+func (*Model) Compare(field string, value interface{}, comparator int) GormDao.Scope {
+	return GormDao.Compare(field, value, comparator)
 }
 
 // Filter 过滤

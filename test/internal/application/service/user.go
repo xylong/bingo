@@ -58,7 +58,11 @@ func (s *UserService) GetList(req *dto.UserReq) (int, string, interface{}) {
 	users, total, _ := aggregation.NewMember(
 		aggregation.WithUser(user.New()),
 		aggregation.WithUserRepo(GormDao.NewUserDao(db.DB)),
-	).GetUsers()
+	).GetUsers(req)
+
+	for _, u := range users {
+		u.HidePhone()
+	}
 
 	return 0, "", map[string]interface{}{
 		"list":  users,

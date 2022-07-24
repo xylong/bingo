@@ -5,6 +5,7 @@ import (
 	"github.com/xylong/bingo/test/internal/domain"
 	"github.com/xylong/bingo/test/internal/domain/model"
 	"github.com/xylong/bingo/test/internal/domain/repository"
+	"github.com/xylong/bingo/test/internal/infrastructure/GormDao"
 	"github.com/xylong/bingo/test/internal/infrastructure/utils"
 	"gorm.io/gorm"
 	"time"
@@ -52,8 +53,8 @@ func (p *Profile) BeforeCreate(db *gorm.DB) error {
 }
 
 func (p *Profile) Get() error {
-	p.Filter(p.Compare("age", 20, model.Equal))
-	p.Filter(Age(20, model.Equal), Gender(Female, model.Equal))
+	p.Filter(p.Compare("age", 20, GormDao.Equal))
+	p.Filter(Age(20, GormDao.Equal), Gender(Female, GormDao.Equal))
 	return nil
 }
 
@@ -62,33 +63,33 @@ func (p *Profile) Create() error {
 }
 
 // UserID 根据用户🆔筛选
-func UserID(uid int, comparator int) model.Scope {
-	return model.Compare("user_id", uid, comparator)
+func UserID(uid int, comparator int) GormDao.Scope {
+	return GormDao.Compare("user_id", uid, comparator)
 }
 
 // Gender 根据性别筛选
-func Gender(gender int8, comparator int) model.Scope {
-	return model.Compare("gender", gender, comparator)
+func Gender(gender int8, comparator int) GormDao.Scope {
+	return GormDao.Compare("gender", gender, comparator)
 }
 
 // Level 根据等级筛选
-func Level(level int8, comparator int) model.Scope {
-	return model.Compare("level", level, comparator)
+func Level(level int8, comparator int) GormDao.Scope {
+	return GormDao.Compare("level", level, comparator)
 }
 
 // Age 根据年龄筛选
-func Age(age int, comparator int) model.Scope {
+func Age(age int, comparator int) GormDao.Scope {
 	return func(db *gorm.DB) *gorm.DB {
 		now := time.Now()
 		year, month, day := now.Year(), now.Format("01"), now.Day()
 		birthday := fmt.Sprintf("%d-%s-%d", year-age, month, day)
 
 		switch comparator {
-		case model.Equal:
+		case GormDao.Equal:
 			return db.Where("birthday >= ? and birthday <= ?", birthday, fmt.Sprintf("%d-12-31", year-age))
-		case model.GreaterThan:
+		case GormDao.GreaterThan:
 			return db.Where("birthday >= ?", birthday)
-		case model.LessThan:
+		case GormDao.LessThan:
 			return db.Where("birthday < ?", birthday)
 		default:
 			return db

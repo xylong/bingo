@@ -19,7 +19,10 @@ func (u *UserDao) Create(modeler repository.Modeler) error {
 	return u.db.Create(modeler).Error
 }
 
-func (u *UserDao) Get(users interface{}) (total int64, err error) {
-	err = u.db.Find(users).Count(&total).Error
-	return
+func (u *UserDao) Get(users interface{}, comparator ...func(db *gorm.DB) *gorm.DB) error {
+	return u.db.Scopes(comparator...).Find(users).Error
+}
+
+func (u *UserDao) Count(modeler repository.Modeler, total *int64, comparator ...func(db *gorm.DB) *gorm.DB) error {
+	return u.db.Model(modeler).Scopes(comparator...).Count(total).Error
 }
