@@ -26,13 +26,11 @@ func (r *UserRep) M2D_SimpleList(users []*user.User) []*dto.SimpleUser {
 
 	if len(users) > 0 {
 		for _, u := range users {
-			u.HidePhone()
-
 			list = append(list, &dto.SimpleUser{
 				ID:       u.ID,
 				Avatar:   u.Avatar,
 				Nickname: u.Nickname,
-				Phone:    u.Phone,
+				Phone:    u.HidePhone(),
 			})
 		}
 	}

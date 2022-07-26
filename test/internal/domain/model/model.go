@@ -5,6 +5,7 @@ import (
 	"github.com/xylong/bingo/test/internal/lib/db"
 	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
+	"strings"
 )
 
 // Model 基础模型
@@ -30,6 +31,31 @@ func (*Model) Compare(field string, value interface{}, comparator int) GormDao.S
 // Filter 过滤
 func (m *Model) Filter(comparator ...func(db *gorm.DB) *gorm.DB) {
 	db.DB.Scopes(comparator...).Find(m.child)
+}
+
+// Order 字段排序
+func (m *Model) Order(field string) func(bool) GormDao.Scope {
+	return func(b bool) GormDao.Scope {
+		builder := strings.Builder{}
+		builder.WriteString(field)
+
+		if b {
+			builder.WriteString(" asc")
+		} else {
+			builder.WriteString(" desc")
+		}
+
+		return func(db *gorm.DB) *gorm.DB {
+			return db.Order(builder.String())
+		}
+	}
+}
+
+// SimplePage 简单分页
+func (m *Model) SimplePage(page, pageSize int) GormDao.Scope {
+	return func(db *gorm.DB) *gorm.DB {
+		return db.Offset((page - 1) * pageSize).Limit(pageSize)
+	}
 }
 
 // One 根据过滤条件查单个记录

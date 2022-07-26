@@ -50,6 +50,12 @@ func (u *User) Create() error {
 func (u *User) Get(req *dto.UserReq) (users []*User, err error) {
 	var s []func(*gorm.DB) *gorm.DB
 
+	s = append(s, u.Order("id")(false))
+
+	if req.Page > 0 && req.PageSize > 0 {
+		s = append(s, u.SimplePage(req.Page, req.PageSize))
+	}
+
 	if req.Nickname != "" {
 		s = append(s, u.CompareNickname(req.Nickname, GormDao.Like))
 	}
@@ -66,10 +72,12 @@ func (u *User) Get(req *dto.UserReq) (users []*User, err error) {
 }
 
 // HidePhone 隐藏手机号
-func (u *User) HidePhone() {
+func (u *User) HidePhone() string {
 	if u.Phone != "" {
 		u.Phone = strings.Join([]string{u.Phone[0:3], "****", u.Phone[7:]}, "")
 	}
+
+	return u.Phone
 }
 
 // CompareNickname 比较昵称
