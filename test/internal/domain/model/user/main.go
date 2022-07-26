@@ -47,7 +47,7 @@ func (u *User) Create() error {
 	return u.Dao.Create(u)
 }
 
-func (u *User) Get(req *dto.UserReq) (users []*User, total int64, err error) {
+func (u *User) Get(req *dto.UserReq) (users []*User, err error) {
 	var s []func(*gorm.DB) *gorm.DB
 
 	if req.Nickname != "" {
@@ -59,11 +59,7 @@ func (u *User) Get(req *dto.UserReq) (users []*User, total int64, err error) {
 	}
 
 	if err = u.Dao.Get(&users, s...); err != nil {
-		return nil, 0, err
-	}
-
-	if err = u.Dao.Count(u, &total, s...); err != nil {
-		return
+		return nil, err
 	}
 
 	return

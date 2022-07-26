@@ -42,7 +42,7 @@ type (
 		ID       int    `json:"id"`
 		Avatar   string `json:"avatar"`
 		Nickname string `json:"nickname"`
-		Email    string `json:"email"`
+		Phone    string `json:"phone"`
 	}
 
 	// ExtraUser 额外用户信息

@@ -6,21 +6,18 @@ import (
 	"github.com/xylong/bingo/test/internal/domain/aggregation"
 	"github.com/xylong/bingo/test/internal/domain/model/profile"
 	"github.com/xylong/bingo/test/internal/domain/model/user"
-	"github.com/xylong/bingo/test/internal/domain/repository"
 	"github.com/xylong/bingo/test/internal/infrastructure/GormDao"
 	"github.com/xylong/bingo/test/internal/lib/db"
 )
 
 // UserService 用户服务
 type UserService struct {
-	Req *assembler.UserReq
-	Rep *assembler.UserRep
-
-	UserDao repository.IUser
+	req *assembler.UserReq
+	rep *assembler.UserRep
 }
 
 func NewUserService() *UserService {
-	return &UserService{Req: &assembler.UserReq{}, Rep: &assembler.UserRep{}, UserDao: GormDao.NewUserDao(db.DB)}
+	return &UserService{req: &assembler.UserReq{}, rep: &assembler.UserRep{}}
 }
 
 func (s *UserService) Find() *user.User {
@@ -30,9 +27,9 @@ func (s *UserService) Find() *user.User {
 }
 
 func (s *UserService) GetSimpleUser(req *dto.SimpleUserReq) *dto.SimpleUser {
-	u := s.Req.D2M_User(req)
+	u := s.req.D2M_User(req)
 
-	return s.Rep.M2D_SimpleUser(u)
+	return s.rep.M2D_SimpleUser(u)
 }
 
 func (s *UserService) Create(register *dto.SmsRegister) interface{} {
@@ -54,18 +51,16 @@ func (s *UserService) Create(register *dto.SmsRegister) interface{} {
 	}
 }
 
-func (s *UserService) GetList(req *dto.UserReq) (int, string, interface{}) {
-	users, total, _ := aggregation.NewMember(
+func (s *UserService) GetList(req *dto.UserReq) (int, string, []*dto.SimpleUser) {
+	users, err := aggregation.NewMember(
 		aggregation.WithUser(user.New()),
 		aggregation.WithUserRepo(GormDao.NewUserDao(db.DB)),
+		aggregation.WithProfileRepo(GormDao.NewProfileDao(db.DB)),
 	).GetUsers(req)
 
-	for _, u := range users {
-		u.HidePhone()
+	if err != nil {
+		return 0, "", nil
 	}
 
-	return 0, "", map[string]interface{}{
-		"list":  users,
-		"total": total,
-	}
+	return 0, "", s.rep.M2D_SimpleList(users)
 }

@@ -99,7 +99,7 @@ func (m *Member) Create() error {
 	return nil
 }
 
-func (m *Member) GetUsers(req *dto.UserReq) ([]*user.User, int64, error) {
+func (m *Member) GetUsers(req *dto.UserReq) ([]*user.User, error) {
 	return m.User.Get(req)
 }
 

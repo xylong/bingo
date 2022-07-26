@@ -17,8 +17,27 @@ func (r *UserRep) M2D_SimpleUser(user *user.User) *dto.SimpleUser {
 		ID:       user.ID,
 		Avatar:   user.Avatar,
 		Nickname: user.Nickname,
-		Email:    user.Email,
+		Phone:    user.Phone,
 	}
+}
+
+func (r *UserRep) M2D_SimpleList(users []*user.User) []*dto.SimpleUser {
+	var list []*dto.SimpleUser
+
+	if len(users) > 0 {
+		for _, u := range users {
+			u.HidePhone()
+
+			list = append(list, &dto.SimpleUser{
+				ID:       u.ID,
+				Avatar:   u.Avatar,
+				Nickname: u.Nickname,
+				Phone:    u.Phone,
+			})
+		}
+	}
+
+	return list
 }
 
 func (r *UserRep) M2D_UserInfo(member *aggregation.Member) *dto.UserInfo {
