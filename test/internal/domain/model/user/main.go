@@ -47,6 +47,10 @@ func (u *User) Create() error {
 	return u.Dao.Create(u)
 }
 
+func (u *User) Single() error {
+	return u.Dao.Single(u)
+}
+
 func (u *User) Get(req *dto.UserReq) (users []*User, err error) {
 	var s []func(*gorm.DB) *gorm.DB
 

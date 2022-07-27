@@ -5,6 +5,8 @@ import (
 	"github.com/xylong/bingo/test/internal/domain/aggregation"
 	"github.com/xylong/bingo/test/internal/domain/model/user"
 	"github.com/xylong/bingo/test/internal/domain/model/userLog"
+	"github.com/xylong/bingo/test/internal/infrastructure/GormDao"
+	"github.com/xylong/bingo/test/internal/lib/db"
 )
 
 // UserRep 用户响应
@@ -17,7 +19,7 @@ func (r *UserRep) M2D_SimpleUser(user *user.User) *dto.SimpleUser {
 		ID:       user.ID,
 		Avatar:   user.Avatar,
 		Nickname: user.Nickname,
-		Phone:    user.Phone,
+		Phone:    user.HidePhone(),
 	}
 }
 
@@ -38,16 +40,34 @@ func (r *UserRep) M2D_SimpleList(users []*user.User) []*dto.SimpleUser {
 	return list
 }
 
-func (r *UserRep) M2D_UserInfo(member *aggregation.Member) *dto.UserInfo {
+func (r *UserRep) M2D_UserInfo(req *dto.UserLogReq, member *aggregation.Member) *dto.UserInfo {
+	member.User.ID = req.ID
+	if err := member.GetUser(); err != nil {
+		return nil
+	}
+
 	info := &dto.UserInfo{
 		ID:       member.User.ID,
 		Nickname: member.User.Nickname,
 	}
-	info.Logs = r.M2D_UserLogs(member.GetLog())
 
+	member.Log = userLog.New(userLog.WithUserID(member.User.ID))
+	member.Log.Dao = GormDao.NewUserLogDao(db.DB)
+
+	info.Log = r.M2D_UserLogs(member.GetLog(req))
 	return info
 }
 
-func (r *UserRep) M2D_UserLogs(logs []*userLog.UserLog) []*dto.UserLog {
-	return nil
+func (r *UserRep) M2D_UserLogs(logs []*userLog.UserLog) (userLogs []*dto.UserLog) {
+	if len(logs) > 0 {
+		for _, log := range logs {
+			userLogs = append(userLogs, &dto.UserLog{
+				ID:   log.ID,
+				Log:  log.Remark,
+				Date: log.CreatedAt.Format("2006-01-02 15:04:05"),
+			})
+		}
+	}
+
+	return userLogs
 }

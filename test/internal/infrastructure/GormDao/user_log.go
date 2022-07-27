@@ -16,3 +16,12 @@ func NewUserLogDao(db *gorm.DB) *UserLogDao {
 func (d *UserLogDao) Create(modeler repository.Modeler) error {
 	return d.db.Create(modeler).Error
 }
+
+// Get 获取用户日志
+func (d *UserLogDao) Get(logs interface{}, comparator ...func(db *gorm.DB) *gorm.DB) error {
+	if err := d.db.Scopes(comparator...).Find(logs).Error; err != nil && err != gorm.ErrRecordNotFound {
+		return err
+	}
+
+	return nil
+}

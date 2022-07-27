@@ -1,6 +1,7 @@
 package aggregation
 
 import (
+	"github.com/sirupsen/logrus"
 	"github.com/xylong/bingo/test/internal/application/dto"
 	"github.com/xylong/bingo/test/internal/domain"
 	"github.com/xylong/bingo/test/internal/domain/model/profile"
@@ -103,6 +104,21 @@ func (m *Member) GetUsers(req *dto.UserReq) ([]*user.User, error) {
 	return m.User.Get(req)
 }
 
-func (m *Member) GetLog() []*userLog.UserLog {
+func (m *Member) GetUser() error {
+	if err := m.User.Single(); err != nil {
+		logrus.Error(err.Error())
+		return NewNotFoundError(NotFoundData, "用户查询失败")
+	}
+
 	return nil
+}
+
+// GetLog 获取用户日志
+func (m *Member) GetLog(req *dto.UserLogReq) []*userLog.UserLog {
+	logs, err := m.Log.Get(req)
+	if err != nil {
+		logrus.Error(err.Error())
+	}
+
+	return logs
 }

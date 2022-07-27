@@ -7,6 +7,7 @@ import (
 	"github.com/xylong/bingo/test/internal/application/service"
 	"github.com/xylong/bingo/test/internal/infrastructure/utils"
 	"github.com/xylong/bingo/test/internal/middleware"
+	"strconv"
 )
 
 func init() {
@@ -64,11 +65,26 @@ func (c *UserController) index(ctx *bingo.Context) (int, string, interface{}) {
 	return c.service.GetList(req)
 }
 
+func (c *UserController) log(ctx *bingo.Context) any {
+	id, err := strconv.Atoi(ctx.Param("id"))
+	if err != nil {
+		return nil
+	}
+
+	req := &dto.UserLogReq{}
+	req.ID = id
+
+	return c.service.GetLog(
+		utils.Exec(ctx.ShouldBind, req).
+			Unwrap().(*dto.UserLogReq))
+}
+
 func (c *UserController) Route(group *bingo.Group) {
 	group.Group("", func(users *bingo.Group) {
 		users.GET("me", c.me)
 		users.PUT("me", c.update)
 		users.GET("users/:id", c.show)
+		users.GET("users/:id/logs", c.log)
 	}, middleware.NewAuthorization())
 
 	group.POST("register", c.smsRegister)

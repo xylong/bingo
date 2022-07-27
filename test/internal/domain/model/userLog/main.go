@@ -1,8 +1,12 @@
 package userLog
 
 import (
+	"github.com/xylong/bingo/test/internal/application/dto"
 	"github.com/xylong/bingo/test/internal/domain"
+	"github.com/xylong/bingo/test/internal/domain/model"
 	"github.com/xylong/bingo/test/internal/domain/repository"
+	"github.com/xylong/bingo/test/internal/infrastructure/GormDao"
+	"gorm.io/gorm"
 	"time"
 )
 
@@ -20,7 +24,8 @@ type UserLog struct {
 	Remark    string    `json:"remark" gorm:"type:varchar(100);comment:描述"`
 	CreatedAt time.Time `json:"created_at"`
 
-	Dao repository.UserLogger `gorm:"-"`
+	Dao          repository.UserLogger `gorm:"-" json:"-"`
+	*model.Model `gorm:"-" json:"-"`
 }
 
 func New(attr ...domain.Attr) *UserLog {
@@ -36,4 +41,27 @@ func (l *UserLog) TableName() string {
 
 func (l *UserLog) Create() error {
 	return l.Dao.Create(l)
+}
+
+// Get 获取用户日志
+func (l *UserLog) Get(req *dto.UserLogReq) (logs []*UserLog, err error) {
+	s := []func(*gorm.DB) *gorm.DB{
+		l.Order("id")(false),
+	}
+
+	if req.Page > 0 && req.PageSize > 0 {
+		s = append(s, l.SimplePage(req.Page, req.PageSize))
+	}
+
+	if req.ID > 0 {
+		s = append(s, l.CompareUser(req.ID))
+	}
+
+	err = l.Dao.Get(&logs, s...)
+	return logs, err
+}
+
+// CompareUser 比较用户🆔
+func (l *UserLog) CompareUser(id int) GormDao.Scope {
+	return l.Compare("user_id", id, GormDao.Equal)
 }

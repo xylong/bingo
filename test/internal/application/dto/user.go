@@ -1,7 +1,5 @@
 package dto
 
-import "time"
-
 // 请求对象
 type (
 	// SmsRegister 短信注册
@@ -32,6 +30,12 @@ type (
 		Age      uint8  `json:"age" form:"age" binding:"omitempty,gte=1,lte=100"`         // 年龄
 		Gender   int8   `json:"gender" form:"gender" binding:"omitempty,oneof=-1 0 1"`    // 性别
 		Level    uint8  `json:"level" form:"level" binding:"omitempty,oneof=1 2 3 4 5 6"` // 等级
+	}
+
+	// UserLogReq 用户日志
+	UserLogReq struct {
+		*Pagination
+		ID int `uri:"id" binding:"omitempty,gt=0"`
 	}
 )
 
@@ -65,14 +69,14 @@ type (
 	}
 
 	UserLog struct {
-		ID   int       `json:"id"`
-		Log  string    `json:"log"`
-		Date time.Time `json:"date"`
+		ID   int    `json:"id"`
+		Log  string `json:"log"`
+		Date string `json:"date"`
 	}
 
 	UserInfo struct {
-		ID       int    `json:"id"`
-		Nickname string `json:"nickname"`
-		Logs     []*UserLog
+		ID       int        `json:"id"`
+		Nickname string     `json:"nickname"`
+		Log      []*UserLog `json:"log"`
 	}
 )

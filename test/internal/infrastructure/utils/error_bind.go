@@ -21,7 +21,7 @@ func (r *ErrorResult) Unwrap() interface{} {
 
 type BindFunc func(interface{}) error
 
-// Exec
+// Exec 执行
 func Exec(f BindFunc, v interface{}) *ErrorResult {
 	return NewErrorResult(v, f(v))
 }

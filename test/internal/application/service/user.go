@@ -28,6 +28,10 @@ func (s *UserService) Find() *user.User {
 
 func (s *UserService) GetSimpleUser(req *dto.SimpleUserReq) *dto.SimpleUser {
 	u := s.req.D2M_User(req)
+	err := aggregation.NewMember(aggregation.WithUser(u), aggregation.WithUserRepo(GormDao.NewUserDao(db.DB))).GetUser()
+	if err != nil {
+		return nil
+	}
 
 	return s.rep.M2D_SimpleUser(u)
 }
@@ -63,4 +67,12 @@ func (s *UserService) GetList(req *dto.UserReq) (int, string, []*dto.SimpleUser)
 	}
 
 	return 0, "", s.rep.M2D_SimpleList(users)
+}
+
+// GetLog 用户日志
+func (s *UserService) GetLog(req *dto.UserLogReq) *dto.UserInfo {
+	return s.rep.M2D_UserInfo(req,
+		aggregation.NewMember(
+			aggregation.WithUser(user.New()),
+			aggregation.WithUserRepo(GormDao.NewUserDao(db.DB))))
 }
