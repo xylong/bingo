@@ -1,6 +1,8 @@
 package v1
 
-import "github.com/xylong/bingo"
+import (
+	"github.com/xylong/bingo"
+)
 
 // Controllers 控制器
 var Controllers = make([]bingo.Controller, 0)

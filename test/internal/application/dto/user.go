@@ -4,7 +4,7 @@ package dto
 type (
 	// SmsRegister 短信注册
 	SmsRegister struct {
-		Phone    string `json:"phone" form:"phone" binding:"required"`        // 手机号
+		Phone    string `json:"phone" form:"phone" binding:"required,phone"`  // 手机号
 		Code     int32  `json:"code" form:"code" binding:"required"`          // 短信验证码
 		Nickname string `json:"nickname" form:"nickname" binding:"omitempty"` // 昵称
 	}
