@@ -27,11 +27,7 @@ func NewUserController() *UserController {
 
 func (c *UserController) smsRegister(ctx *bingo.Context) interface{} {
 	form := &dto.SmsRegister{}
-	if err := ctx.ShouldBind(form); err != nil {
-		return err.Error()
-	}
-
-	return c.service.Create(form)
+	return c.service.Create(utils.Exec(ctx.ShouldBind, form).Unwrap().(*dto.SmsRegister))
 }
 
 func (c *UserController) login(ctx *bingo.Context) string {

@@ -1,5 +1,7 @@
 package utils
 
+import "github.com/xylong/bingo/test/internal/application/validators"
+
 // ErrorResult 错误结果
 type ErrorResult struct {
 	data interface{}
@@ -13,6 +15,7 @@ func NewErrorResult(data interface{}, err error) *ErrorResult {
 // Unwrap 错误处理
 func (r *ErrorResult) Unwrap() interface{} {
 	if r.err != nil {
+		validators.ValidateMessage(r.err)
 		panic(r.err.Error())
 	}
 

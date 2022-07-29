@@ -3,12 +3,11 @@ package main
 import (
 	"github.com/xylong/bingo"
 	v1 "github.com/xylong/bingo/test/internal/api/v1"
-	_ "github.com/xylong/bingo/test/internal/application/validators"
 	"github.com/xylong/bingo/test/internal/middleware"
 )
 
 func main() {
 	bingo.Init().
-		Mount("v1", v1.Controllers...)(middleware.NewLogger()).
+		Mount("v1", v1.Controllers...)(middleware.NewLogger(), middleware.NewValidate()).
 		Lunch()
 }
