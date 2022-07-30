@@ -31,6 +31,7 @@ func register(rule string, fn validator.Func) {
 	}
 }
 
+// ValidateMessage 绑定验证消息
 func ValidateMessage(err error) {
 	if v, ok := err.(validator.ValidationErrors); ok {
 		for _, fieldError := range v {
