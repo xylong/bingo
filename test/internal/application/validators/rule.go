@@ -2,6 +2,7 @@ package validators
 
 import (
 	"github.com/go-playground/validator/v10"
+	"github.com/xylong/bingo"
 	"regexp"
 )
 
@@ -20,7 +21,7 @@ var CheckID validator.Func = func(fl validator.FieldLevel) bool {
 type Nickname string
 
 func (n Nickname) toFunc() validator.Func {
-	message["nickname"] = "昵称必须在2-10位之间"
+	bingo.ValidateMessage["nickname"] = "昵称必须在2-10位之间"
 
 	return func(fl validator.FieldLevel) bool {
 		value, ok := fl.Field().Interface().(string)

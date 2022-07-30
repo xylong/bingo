@@ -1,6 +1,4 @@
-package utils
-
-import "github.com/xylong/bingo/test/internal/application/validators"
+package bingo
 
 // ErrorResult 错误结果
 type ErrorResult struct {
@@ -13,18 +11,12 @@ func NewErrorResult(data interface{}, err error) *ErrorResult {
 }
 
 // Unwrap 错误处理
+// 如果执行有错误则抛出错误，否则返回执行结果
 func (r *ErrorResult) Unwrap() interface{} {
 	if r.err != nil {
-		validators.ValidateMessage(r.err)
+		message(r.err)
 		panic(r.err.Error())
 	}
 
 	return r.data
-}
-
-type BindFunc func(interface{}) error
-
-// Exec 执行
-func Exec(f BindFunc, v interface{}) *ErrorResult {
-	return NewErrorResult(v, f(v))
 }

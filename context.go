@@ -20,3 +20,8 @@ func (c *Context) Token(key ...string) string {
 	}
 	return c.Request.Header.Get(authKey)
 }
+
+// Binding 参数绑定
+func (c *Context) Binding(f func(interface{}) error, data interface{}) *ErrorResult {
+	return NewErrorResult(data, f(data))
+}

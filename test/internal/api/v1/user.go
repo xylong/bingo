@@ -5,7 +5,6 @@ import (
 	"github.com/xylong/bingo"
 	"github.com/xylong/bingo/test/internal/application/dto"
 	"github.com/xylong/bingo/test/internal/application/service"
-	"github.com/xylong/bingo/test/internal/infrastructure/utils"
 	"github.com/xylong/bingo/test/internal/middleware"
 	"strconv"
 )
@@ -27,7 +26,7 @@ func NewUserController() *UserController {
 
 func (c *UserController) smsRegister(ctx *bingo.Context) interface{} {
 	return c.service.Create(
-		utils.Exec(ctx.ShouldBind, &dto.SmsRegister{}).
+		ctx.Binding(ctx.ShouldBind, &dto.SmsRegister{}).
 			Unwrap().(*dto.SmsRegister))
 }
 
@@ -49,7 +48,7 @@ func (c *UserController) update(ctx *bingo.Context) string {
 
 func (c *UserController) show(ctx *bingo.Context) any {
 	return c.service.GetSimpleUser(
-		utils.Exec(ctx.ShouldBindUri, &dto.SimpleUserReq{}).
+		ctx.Binding(ctx.ShouldBindUri, &dto.SimpleUserReq{}).
 			Unwrap().(*dto.SimpleUserReq))
 }
 
@@ -72,7 +71,7 @@ func (c *UserController) log(ctx *bingo.Context) any {
 	req.ID = id
 
 	return c.service.GetLog(
-		utils.Exec(ctx.ShouldBind, req).
+		ctx.Binding(ctx.ShouldBind, req).
 			Unwrap().(*dto.UserLogReq))
 }
 
