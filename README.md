@@ -47,7 +47,11 @@ Route(group *bingo.Group) {
 
 ### 控制器
 1. 控制器：bingo.Controller接口，包含一个路由注册方法**Route(*bingo.Group)***，只需要实现该方法即是控制器。
-2. 控制器方法：即路由函数，函数签名为**func (*bingo.Context)***，脚手架对gin.Context进行了重载，支持更多便捷操作。
+2. 控制器方法：即路由函数，脚手架对gin.Context和gin.HandlerFunc进行了重载，支持直接返回结果值，函数签名为：
+   1. **func(*bingo.Context) (int, string, interface{})***，该签名返回数据为json格式{"code":0,"message":"","data":null}
+   2. **func(*bingo.Context) interface{}***，返回任意类型数据
+   3. **func(*bingo.Context) string***，返回字符串
+   4. **func(*bingo.Context)***，没有返回值
 ```go
 // UserController 用户控制器
 type UserController struct {}
@@ -78,5 +82,5 @@ func main() {
 		Lunch()
 }
 ```
-
+example在单元测试里
 

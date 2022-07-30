@@ -53,12 +53,9 @@ func (c *UserController) show(ctx *bingo.Context) any {
 }
 
 func (c *UserController) index(ctx *bingo.Context) (int, string, interface{}) {
-	req := &dto.UserReq{}
-	if err := ctx.ShouldBind(req); err != nil {
-		return 400, err.Error(), nil
-	}
-
-	return c.service.GetList(req)
+	return c.service.GetList(
+		ctx.Binding(ctx.ShouldBind, &dto.UserReq{}).
+			Unwrap().(*dto.UserReq))
 }
 
 func (c *UserController) log(ctx *bingo.Context) any {
