@@ -46,6 +46,18 @@ func (b *Bingo) Mount(group string, controller ...Controller) func(middleware ..
 	}
 }
 
+// Crontab 定时任务
+// 0/1 * * * * * 每秒执行
+func (b *Bingo) Crontab(expression string, f func()) *Bingo {
+	if entryID, err := getCron().AddFunc(expression, f); err != nil {
+		logrus.Error(err.Error())
+	} else {
+		logrus.Info("cron id is ", entryID)
+	}
+
+	return b
+}
+
 // Lunch 启动
 func (b *Bingo) Lunch() {
 	server := &http.Server{
@@ -58,6 +70,8 @@ func (b *Bingo) Lunch() {
 			logrus.Info("http server closed")
 		}
 	}()
+
+	getCron().Start()
 
 	quit := make(chan os.Signal)
 	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)

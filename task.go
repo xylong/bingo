@@ -1,14 +1,19 @@
 package bingo
 
-import "sync"
+import (
+	"github.com/robfig/cron/v3"
+	"sync"
+)
 
 var (
-	once      sync.Once
-	taskQueue chan *TaskExecutor
+	taskOnce     sync.Once
+	cronOnce     sync.Once
+	taskList     chan *TaskExecutor
+	cronTaskList *cron.Cron
 )
 
 func init() {
-	tasks := getTaskQueue()
+	tasks := getTaskList()
 
 	go func() {
 		for task := range tasks {
@@ -30,12 +35,12 @@ func exec(executor *TaskExecutor) {
 	}()
 }
 
-func getTaskQueue() chan *TaskExecutor {
-	once.Do(func() {
-		taskQueue = make(chan *TaskExecutor)
+func getTaskList() chan *TaskExecutor {
+	taskOnce.Do(func() {
+		taskList = make(chan *TaskExecutor)
 	})
 
-	return taskQueue
+	return taskList
 }
 
 // TaskFunc 协程任务方法
@@ -61,7 +66,15 @@ func (t *TaskExecutor) Do() {
 func Task(f TaskFunc, callback func(), param ...any) {
 	if f != nil {
 		go func() {
-			getTaskQueue() <- NewTaskExecutor(f, param, callback)
+			getTaskList() <- NewTaskExecutor(f, param, callback)
 		}()
 	}
+}
+
+func getCron() *cron.Cron {
+	cronOnce.Do(func() {
+		cronTaskList = cron.New(cron.WithSeconds())
+	})
+
+	return cronTaskList
 }
