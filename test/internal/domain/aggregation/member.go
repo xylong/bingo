@@ -72,6 +72,14 @@ func WithProfileRepo(iProfile repository.Profiler) domain.Attr {
 	}
 }
 
+func WithLog(log *userLog.UserLog) domain.Attr {
+	return func(i interface{}) {
+		if log != nil {
+			i.(*Member).Log = log
+		}
+	}
+}
+
 func WithLogRepo(logger repository.UserLogger) domain.Attr {
 	return func(i interface{}) {
 		if logger != nil {
@@ -92,10 +100,6 @@ func (m *Member) Create() error {
 	}
 
 	m.Log = userLog.New(userLog.WithUserID(m.User.ID), userLog.WithType(userLog.Register), userLog.WithRemark("新增用户"))
-	m.Log.Dao = m.LogRepo
-	if err := m.Log.Create(); err != nil {
-		return NewOperatorError(CreateUserLogError)
-	}
 
 	return nil
 }
@@ -121,4 +125,15 @@ func (m *Member) GetLog(req *dto.UserLogReq) []*userLog.UserLog {
 	}
 
 	return logs
+}
+
+// AddLog 添加用户日志
+func (m *Member) AddLog() error {
+	m.Log.Dao = m.LogRepo
+
+	if err := m.Log.Create(); err != nil {
+		return NewOperatorError(CreateUserLogError)
+	}
+
+	return nil
 }

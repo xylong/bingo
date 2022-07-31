@@ -1,11 +1,14 @@
 package service
 
 import (
+	"fmt"
+	"github.com/xylong/bingo"
 	"github.com/xylong/bingo/test/internal/application/assembler"
 	"github.com/xylong/bingo/test/internal/application/dto"
 	"github.com/xylong/bingo/test/internal/domain/aggregation"
 	"github.com/xylong/bingo/test/internal/domain/model/profile"
 	"github.com/xylong/bingo/test/internal/domain/model/user"
+	"github.com/xylong/bingo/test/internal/domain/model/userLog"
 	"github.com/xylong/bingo/test/internal/infrastructure/GormDao"
 	"github.com/xylong/bingo/test/internal/lib/db"
 )
@@ -44,15 +47,32 @@ func (s *UserService) Create(register *dto.SmsRegister) interface{} {
 	member := aggregation.NewMember(
 		aggregation.WithUser(u), aggregation.WithUserRepo(ud),
 		aggregation.WithProfile(p), aggregation.WithProfileRepo(pd),
-		aggregation.WithLogRepo(GormDao.NewUserLogDao(tx)),
 	)
 	if err := member.Create(); err != nil {
 		tx.Rollback()
 		return err
 	} else {
 		tx.Commit()
+
+		bingo.Task(s.Log, func() {
+			fmt.Printf("user:%d 通过短信注册成功", u.ID)
+		}, u, userLog.Register, "短信注册")
+
 		return nil
 	}
+}
+
+// Log 记录用户日志
+func (s *UserService) Log(param ...interface{}) {
+	fmt.Println(param[0], param[1], param[2], "aaa")
+	_ = aggregation.NewMember(
+		aggregation.WithLogRepo(GormDao.NewUserLogDao(db.DB)),
+		aggregation.WithLog(
+			s.req.D2M_Log(
+				param[0].(*user.User),
+				param[1].(int),
+				param[2].(string)),
+		)).AddLog()
 }
 
 func (s *UserService) GetList(req *dto.UserReq) (int, string, []*dto.SimpleUser) {
