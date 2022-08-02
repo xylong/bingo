@@ -1,7 +1,7 @@
 package model
 
 import (
-	"github.com/xylong/bingo/test/internal/infrastructure/GormDao"
+	"github.com/xylong/bingo/test/internal/infrastructure/dao/GormDao"
 	"github.com/xylong/bingo/test/internal/lib/db"
 	"gorm.io/gorm"
 	"gorm.io/gorm/clause"

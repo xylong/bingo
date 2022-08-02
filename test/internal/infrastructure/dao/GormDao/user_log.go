@@ -1,7 +1,9 @@
 package GormDao
 
 import (
+	"github.com/Masterminds/squirrel"
 	"github.com/xylong/bingo/test/internal/domain/repository"
+	"github.com/xylong/bingo/test/internal/infrastructure/dao"
 	"gorm.io/gorm"
 )
 
@@ -24,4 +26,13 @@ func (d *UserLogDao) Get(logs interface{}, comparator ...func(db *gorm.DB) *gorm
 	}
 
 	return nil
+}
+
+func (d *UserLogDao) ContinuousLogin() (users []*int) {
+	sqlMapper := dao.Mapper(squirrel.Select("user_id").
+		From("user_logs").Where("type=?", 0).ToSql())
+
+	d.db.Raw(sqlMapper.Sql, sqlMapper.Args).Find(users)
+
+	return
 }

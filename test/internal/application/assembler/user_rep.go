@@ -5,7 +5,7 @@ import (
 	"github.com/xylong/bingo/test/internal/domain/aggregation"
 	"github.com/xylong/bingo/test/internal/domain/model/user"
 	"github.com/xylong/bingo/test/internal/domain/model/userLog"
-	"github.com/xylong/bingo/test/internal/infrastructure/GormDao"
+	"github.com/xylong/bingo/test/internal/infrastructure/dao/GormDao"
 	"github.com/xylong/bingo/test/internal/lib/db"
 )
 

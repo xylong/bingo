@@ -5,7 +5,7 @@ import (
 	"github.com/xylong/bingo/test/internal/domain"
 	"github.com/xylong/bingo/test/internal/domain/model"
 	"github.com/xylong/bingo/test/internal/domain/repository"
-	"github.com/xylong/bingo/test/internal/infrastructure/GormDao"
+	"github.com/xylong/bingo/test/internal/infrastructure/dao/GormDao"
 	"github.com/xylong/bingo/test/internal/infrastructure/utils"
 	"gorm.io/gorm"
 	"time"

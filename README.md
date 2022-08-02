@@ -20,6 +20,8 @@ go get -u github.com/xylong/bingo
 ### 相关库
 - [gin](https://github.com/gin-gonic/gin) http框架
 - [logrus](https://github.com/sirupsen/logrus) 日志
+- [gorm](gorm.io/gorm) orm
+- [squirrel](github.com/Masterminds/squirrel) sql拼装工具
 
 ****
 
