@@ -28,7 +28,7 @@ func (d *UserLogDao) Get(logs interface{}, comparator ...func(db *gorm.DB) *gorm
 	return nil
 }
 
-func (d *UserLogDao) ContinuousLogin() (users []*int) {
+func (d *UserLogDao) ContinuousLogin() (users []int) {
 	sqlMapper := dao.Mapper(squirrel.Select("user_id").
 		From("user_logs").Where("type=?", 0).ToSql())
 
