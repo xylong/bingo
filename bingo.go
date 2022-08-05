@@ -16,12 +16,17 @@ import (
 // Bingo 脚手架
 type Bingo struct {
 	*gin.Engine
-	group *gin.RouterGroup
+	group *gin.RouterGroup       // 路由分组
+	expr  map[string]interface{} // 表达式
 }
 
 // Init 初始化
 func Init() *Bingo {
-	b := &Bingo{Engine: gin.New()}
+	b := &Bingo{
+		Engine: gin.New(),
+		expr:   make(map[string]interface{}),
+	}
+
 	return b
 }
 
@@ -47,12 +52,22 @@ func (b *Bingo) Mount(group string, controller ...Controller) func(middleware ..
 }
 
 // Crontab 定时任务
-// 0/1 * * * * * 每秒执行
-func (b *Bingo) Crontab(expression string, f func()) *Bingo {
-	if entryID, err := getCron().AddFunc(expression, f); err != nil {
+// cron 定时任务表达式
+// expr 执行函数，执行函数如果是方法则直接加入定时任务方法，如果是gin表达式则转为可执行方法加入定时任务
+func (b *Bingo) Crontab(cron string, expr interface{}) *Bingo {
+	var err error
+
+	switch value := expr.(type) {
+	case func():
+		_, err = getCron().AddFunc(cron, value)
+	case string:
+		_, err = getCron().AddFunc(cron, func() {
+			ExecExpr(value)
+		})
+	}
+
+	if err != nil {
 		logrus.Error(err.Error())
-	} else {
-		logrus.Info("cron id is ", entryID)
 	}
 
 	return b

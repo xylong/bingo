@@ -16,7 +16,10 @@ const (
 	ComparePattern   = `^(` + VarPattern + `)\s*(` + CompareSign + `)\s*(` + VarPattern + `)\s*$`
 )
 
-type ComparableExpr string
+type (
+	Expr           string
+	ComparableExpr string
+)
 
 func (e ComparableExpr) filter() string {
 	reg, err := regexp.Compile(ComparePattern)
@@ -64,20 +67,20 @@ func IsComparableExpr(expr string) bool {
 }
 
 // ExecExpr 执行表达式，临时方法后期需要修改
-func ExecExpr(expr string, data map[string]interface{}) (string, error) {
+func ExecExpr(expr Expr, data map[string]interface{}) (string, error) {
 	tpl := template.New("expr").Funcs(map[string]interface{}{
 		"echo": func(params ...interface{}) interface{} {
 			return fmt.Sprintf("echo:%v", params[0])
 		},
 	})
 
-	t, err := tpl.Parse(fmt.Sprintf("{{%s}}", ComparableExpr(expr).filter()))
+	t, err := tpl.Parse(fmt.Sprintf("{{%s}}", expr))
 	if err != nil {
 		return "", err
 	}
 
 	var buf = &bytes.Buffer{}
-	if err := t.Execute(buf, data); err != nil {
+	if err = t.Execute(buf, data); err != nil {
 		return "", err
 	}
 
