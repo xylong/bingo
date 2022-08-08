@@ -3,13 +3,15 @@ package main
 import (
 	"github.com/xylong/bingo"
 	v1 "github.com/xylong/bingo/test/internal/api/v1"
+	v2 "github.com/xylong/bingo/test/internal/api/v2"
 	"github.com/xylong/bingo/test/internal/middleware"
 )
 
 func main() {
 	bingo.Init().
 		Mount("v1", v1.Controllers...)(middleware.NewLogger(), middleware.NewValidate()).
-		Crontab("0/3 * * * * *", "MockController.Foo").
+		Mount("v2", v2.Controllers...)().
+		Crontab("0/3 * * * * *", ".MockController.Foo").
 		Lunch()
 
 }

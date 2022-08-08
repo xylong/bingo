@@ -24,6 +24,10 @@ func NewUserController() *UserController {
 	}
 }
 
+func (c *UserController) Name() string {
+	return "UserController"
+}
+
 func (c *UserController) smsRegister(ctx *bingo.Context) interface{} {
 	return c.service.Create(
 		ctx.Binding(ctx.ShouldBind, &dto.SmsRegister{}).

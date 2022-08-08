@@ -17,6 +17,7 @@ import (
 type Bingo struct {
 	*gin.Engine
 	group *gin.RouterGroup       // 路由分组
+	bean  *BeanFactory           // 注入工厂
 	expr  map[string]interface{} // 表达式
 }
 
@@ -24,6 +25,7 @@ type Bingo struct {
 func Init() *Bingo {
 	b := &Bingo{
 		Engine: gin.New(),
+		bean:   NewBeanFactory(),
 		expr:   make(map[string]interface{}),
 	}
 
@@ -45,10 +47,23 @@ func (b *Bingo) Mount(group string, controller ...Controller) func(middleware ..
 		for _, c := range controller {
 			g.middlewares = append(g.middlewares, middleware...)
 			c.Route(g)
+
+			b.bean.inject(c) // 将bean注入控制器
+			b.joinBean(c)
 		}
 
 		return b
 	}
+}
+
+// joinBean 加入bean
+func (b *Bingo) joinBean(beans ...Bean) *Bingo {
+	for _, bean := range beans {
+		b.expr[bean.Name()] = bean
+	}
+
+	b.bean.setBean(beans...)
+	return b
 }
 
 // Crontab 定时任务
@@ -62,7 +77,9 @@ func (b *Bingo) Crontab(cron string, expr interface{}) *Bingo {
 		_, err = getCron().AddFunc(cron, value)
 	case string:
 		_, err = getCron().AddFunc(cron, func() {
-			ExecExpr(value)
+			if _, err := ExecExpr(Expr(value), b.expr); err != nil {
+				logrus.Error(err.Error())
+			}
 		})
 	}
 

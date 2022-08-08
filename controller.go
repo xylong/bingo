@@ -8,6 +8,7 @@ import (
 // Controller 控制器
 type Controller interface {
 	Route(group *Group)
+	Name() string
 }
 
 // Bind 参数绑定

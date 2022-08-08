@@ -15,8 +15,13 @@ func NewMockController() *MockController {
 	return &MockController{}
 }
 
-func (c *MockController) Foo(ctx *bingo.Context) {
+func (c *MockController) Name() string {
+	return "MockController"
+}
+
+func (c *MockController) Foo() interface{} {
 	fmt.Println("测试定时器")
+	return nil
 }
 
 func (c *MockController) Route(group *bingo.Group) {
