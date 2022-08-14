@@ -7,6 +7,7 @@ require (
 	github.com/gin-gonic/gin v1.7.7
 	github.com/go-playground/validator/v10 v10.11.0
 	github.com/robfig/cron/v3 v3.0.0
+	github.com/shenyisyn/goft-expr v0.3.0
 	github.com/sirupsen/logrus v1.8.1
 	golang.org/x/crypto v0.0.0-20220525230936-793ad666bf5e
 	gopkg.in/yaml.v2 v2.4.0
@@ -15,6 +16,7 @@ require (
 )
 
 require (
+	github.com/antlr/antlr4 v0.0.0-20200712162734-eb1adaa8a7a6 // indirect
 	github.com/gin-contrib/sse v0.1.0 // indirect
 	github.com/go-playground/locales v0.14.0 // indirect
 	github.com/go-playground/universal-translator v0.18.0 // indirect

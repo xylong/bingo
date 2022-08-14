@@ -2,7 +2,6 @@ package model
 
 import (
 	"github.com/xylong/bingo/test/internal/infrastructure/dao/GormDao"
-	"github.com/xylong/bingo/test/internal/lib/db"
 	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
 	"strings"
@@ -10,6 +9,7 @@ import (
 
 // Model 基础模型
 type Model struct {
+	DB       *gorm.DB `inject:"-"`
 	child    interface{}
 	conflict func() clause.OnConflict
 }
@@ -30,7 +30,7 @@ func (*Model) Compare(field string, value interface{}, comparator int) GormDao.S
 
 // Filter 过滤
 func (m *Model) Filter(comparator ...func(db *gorm.DB) *gorm.DB) {
-	db.DB.Scopes(comparator...).Find(m.child)
+	m.DB.Scopes(comparator...).Find(m.child)
 }
 
 // Order 字段排序
@@ -60,18 +60,18 @@ func (m *Model) SimplePage(page, pageSize int) GormDao.Scope {
 
 // One 根据过滤条件查单个记录
 func (m *Model) One(comparator ...func(db *gorm.DB) *gorm.DB) {
-	db.DB.Scopes(comparator...).First(m.child)
+	m.DB.Scopes(comparator...).First(m.child)
 }
 
 // GetByID 根据🆔获取
 func (m *Model) GetByID(id int) interface{} {
-	db.DB.First(m.child, id)
+	m.DB.First(m.child, id)
 	return m.child
 }
 
 // Save 指定字段保存
 func (m *Model) Save(column ...string) error {
-	return db.DB.Clauses(m.conflict()).Select(column).Save(m.child).Error
+	return m.DB.Clauses(m.conflict()).Select(column).Save(m.child).Error
 }
 
 // Conflict 冲突

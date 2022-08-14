@@ -5,19 +5,24 @@ import (
 	"errors"
 	"github.com/gin-gonic/gin"
 	"github.com/sirupsen/logrus"
+	"github.com/xylong/bingo/ioc"
 	"log"
 	"net/http"
 	"os"
 	"os/signal"
+	"reflect"
 	"syscall"
 	"time"
 )
+
+type Bean interface {
+	Name() string
+}
 
 // Bingo 脚手架
 type Bingo struct {
 	*gin.Engine
 	group *gin.RouterGroup       // 路由分组
-	bean  *BeanFactory           // 注入工厂
 	expr  map[string]interface{} // 表达式
 }
 
@@ -25,7 +30,6 @@ type Bingo struct {
 func Init() *Bingo {
 	b := &Bingo{
 		Engine: gin.New(),
-		bean:   NewBeanFactory(),
 		expr:   make(map[string]interface{}),
 	}
 
@@ -47,12 +51,25 @@ func (b *Bingo) Mount(group string, controller ...Controller) func(middleware ..
 		for _, c := range controller {
 			g.middlewares = append(g.middlewares, middleware...)
 			c.Route(g)
-
-			b.bean.inject(c) // 将bean注入控制器
-			b.joinBean(c)
+			b.joinBean(c) // 将控制器加入容器
 		}
 
 		return b
+	}
+}
+
+// Inject 注入依赖实体
+func (b *Bingo) Inject(entities ...interface{}) *Bingo {
+	ioc.Factory.Unwrap(entities...)
+	return b
+}
+
+// applyBean 给ioc容器中所有结构体注入依赖
+func (b *Bingo) applyBean() {
+	for key, value := range ioc.Factory.GetMapper() {
+		if key.Elem().Kind() == reflect.Struct {
+			ioc.Factory.Apply(value.Interface())
+		}
 	}
 }
 
@@ -60,9 +77,9 @@ func (b *Bingo) Mount(group string, controller ...Controller) func(middleware ..
 func (b *Bingo) joinBean(beans ...Bean) *Bingo {
 	for _, bean := range beans {
 		b.expr[bean.Name()] = bean
+		ioc.Factory.Set(bean)
 	}
 
-	b.bean.setBean(beans...)
 	return b
 }
 
@@ -96,6 +113,8 @@ func (b *Bingo) Lunch() {
 		Addr:    ":8080",
 		Handler: b.Engine,
 	}
+
+	b.applyBean()
 
 	go func() {
 		if err := server.ListenAndServe(); err != nil && errors.Is(err, http.ErrServerClosed) {

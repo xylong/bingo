@@ -16,6 +16,8 @@ go get -u github.com/xylong/bingo
     - [ ] 路由中间件
 - [ ] 日志
     - [ ] 日志分割
+- [x] ioc容器
+    - [x] 依赖注入
 
 ### 相关库
 - [gin](https://github.com/gin-gonic/gin) http框架
@@ -68,6 +70,46 @@ func (c *UserController) register(ctx *bingo.Context) interface{} {
 	return c.service.Create(
 		ctx.Binding(ctx.ShouldBind, &dto.SmsRegister{}).
 			Unwrap().(*dto.SmsRegister))
+}
+```
+
+****
+
+### IOC与依赖注入
+脚手架提供了一个轻量级的ioc容器，并且支持单例、多例的注入。
+1. **Inject**方法，向容器传入依赖实体（***注：传入参数必须为结构体指针***），传入的实体如果包含有创建其它实体指针的方法将会被自动展开存入ioc容器当中
+2. **inject**标签，实体字段通过标注该标签自动注入依赖
+   1. 单例：`inject:"-"`，直接从ioc中获取依赖
+   2. 多例：`inject:"结构体名.方法名"`，多例注入每次都将创建新的实体
+
+#### 配置依赖管理
+```go
+// Service service依赖管理
+type Service struct {
+}
+
+func NewService() *Service {
+    return &Service{}
+}
+
+// User 创建UserService
+func (c *Service) User() *service.UserService {
+    return &service.UserService{
+        Req: &assembler.UserReq{},
+        Rep: &assembler.UserRep{},
+    }
+}
+```
+#### ioc
+```go
+// Service及UserService都会被保存在ioc中
+bingo.Init().Inject(config.NewService()).Lunch()
+```
+#### 依赖注入
+```go
+type UserController struct {
+    Service1 *service.UserService `inject:"-"`   // 单例注入
+    Service2 *service.UserService `inject:"Service.User()"`   // 多例注入
 }
 ```
 

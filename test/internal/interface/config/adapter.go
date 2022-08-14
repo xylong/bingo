@@ -1,4 +1,4 @@
-package db
+package config
 
 import (
 	"gorm.io/driver/mysql"
@@ -9,9 +9,16 @@ import (
 	"time"
 )
 
-var DB *gorm.DB
+// Adapter db配置
+type Adapter struct {
+}
 
-func init() {
+func NewAdapter() *Adapter {
+	return &Adapter{}
+}
+
+// Gorm 创建gorm
+func (a *Adapter) Gorm() *gorm.DB {
 	dsn := "root:123456@tcp(127.0.0.1:3306)/test?charset=utf8mb4&parseTime=True&loc=Local"
 
 	db, err := gorm.Open(mysql.New(mysql.Config{
@@ -41,5 +48,5 @@ func init() {
 	sqlDB.SetMaxOpenConns(20)
 	sqlDB.SetConnMaxLifetime(time.Second * 10)
 
-	DB = db
+	return db
 }

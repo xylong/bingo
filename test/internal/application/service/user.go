@@ -10,17 +10,14 @@ import (
 	"github.com/xylong/bingo/test/internal/domain/model/user"
 	"github.com/xylong/bingo/test/internal/domain/model/userLog"
 	GormDao2 "github.com/xylong/bingo/test/internal/infrastructure/dao/GormDao"
-	"github.com/xylong/bingo/test/internal/lib/db"
+	"gorm.io/gorm"
 )
 
 // UserService 用户服务
 type UserService struct {
-	req *assembler.UserReq
-	rep *assembler.UserRep
-}
-
-func NewUserService() *UserService {
-	return &UserService{req: &assembler.UserReq{}, rep: &assembler.UserRep{}}
+	Req *assembler.UserReq
+	Rep *assembler.UserRep
+	DB  *gorm.DB `inject:"-"`
 }
 
 func (s *UserService) Find() *user.User {
@@ -30,17 +27,17 @@ func (s *UserService) Find() *user.User {
 }
 
 func (s *UserService) GetSimpleUser(req *dto.SimpleUserReq) *dto.SimpleUser {
-	u := s.req.D2M_User(req)
-	err := aggregation.NewMember(aggregation.WithUser(u), aggregation.WithUserRepo(GormDao2.NewUserDao(db.DB))).GetUser()
+	u := s.Req.D2M_User(req)
+	err := aggregation.NewMember(aggregation.WithUser(u), aggregation.WithUserRepo(GormDao2.NewUserDao(s.DB))).GetUser()
 	if err != nil {
 		return nil
 	}
 
-	return s.rep.M2D_SimpleUser(u)
+	return s.Rep.M2D_SimpleUser(u)
 }
 
 func (s *UserService) Create(register *dto.SmsRegister) interface{} {
-	tx := db.DB.Begin()
+	tx := s.DB.Begin()
 	u, ud := user.New(user.WithPhone(register.Phone), user.WithNickName(register.Nickname)), GormDao2.NewUserDao(tx)
 	p, pd := profile.New(), GormDao2.NewProfileDao(tx)
 
@@ -66,9 +63,9 @@ func (s *UserService) Create(register *dto.SmsRegister) interface{} {
 func (s *UserService) Log(param ...interface{}) {
 	fmt.Println(param[0], param[1], param[2], "aaa")
 	_ = aggregation.NewMember(
-		aggregation.WithLogRepo(GormDao2.NewUserLogDao(db.DB)),
+		aggregation.WithLogRepo(GormDao2.NewUserLogDao(s.DB)),
 		aggregation.WithLog(
-			s.req.D2M_Log(
+			s.Req.D2M_Log(
 				param[0].(*user.User),
 				param[1].(int),
 				param[2].(string)),
@@ -78,21 +75,21 @@ func (s *UserService) Log(param ...interface{}) {
 func (s *UserService) GetList(req *dto.UserReq) (int, string, []*dto.SimpleUser) {
 	users, err := aggregation.NewMember(
 		aggregation.WithUser(user.New()),
-		aggregation.WithUserRepo(GormDao2.NewUserDao(db.DB)),
-		aggregation.WithProfileRepo(GormDao2.NewProfileDao(db.DB)),
+		aggregation.WithUserRepo(GormDao2.NewUserDao(s.DB)),
+		aggregation.WithProfileRepo(GormDao2.NewProfileDao(s.DB)),
 	).GetUsers(req)
 
 	if err != nil {
 		return 0, "", nil
 	}
 
-	return 0, "", s.rep.M2D_SimpleList(users)
+	return 0, "", s.Rep.M2D_SimpleList(users)
 }
 
 // GetLog 用户日志
 func (s *UserService) GetLog(req *dto.UserLogReq) *dto.UserInfo {
-	return s.rep.M2D_UserInfo(req,
+	return s.Rep.M2D_UserInfo(req,
 		aggregation.NewMember(
 			aggregation.WithUser(user.New()),
-			aggregation.WithUserRepo(GormDao2.NewUserDao(db.DB))))
+			aggregation.WithUserRepo(GormDao2.NewUserDao(s.DB))))
 }

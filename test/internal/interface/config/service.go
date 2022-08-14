@@ -5,14 +5,16 @@ import (
 	"github.com/xylong/bingo/test/internal/application/service"
 )
 
-type UserServiceConfig struct {
+// Service service依赖管理
+type Service struct {
 }
 
-func NewUserServiceConfig() *UserServiceConfig {
-	return &UserServiceConfig{}
+func NewService() *Service {
+	return &Service{}
 }
 
-func (c *UserServiceConfig) UserService() *service.UserService {
+// User 创建UserService
+func (c *Service) User() *service.UserService {
 	return &service.UserService{
 		Req: &assembler.UserReq{},
 		Rep: &assembler.UserRep{},

@@ -14,14 +14,11 @@ func init() {
 }
 
 type UserController struct {
-	// todo 注入
-	service *service.UserService
+	Service *service.UserService `inject:"-"`
 }
 
 func NewUserController() *UserController {
-	return &UserController{
-		service: service.NewUserService(),
-	}
+	return &UserController{}
 }
 
 func (c *UserController) Name() string {
@@ -29,7 +26,7 @@ func (c *UserController) Name() string {
 }
 
 func (c *UserController) smsRegister(ctx *bingo.Context) interface{} {
-	return c.service.Create(
+	return c.Service.Create(
 		ctx.Binding(ctx.ShouldBind, &dto.SmsRegister{}).
 			Unwrap().(*dto.SmsRegister))
 }
@@ -51,13 +48,13 @@ func (c *UserController) update(ctx *bingo.Context) string {
 }
 
 func (c *UserController) show(ctx *bingo.Context) any {
-	return c.service.GetSimpleUser(
+	return c.Service.GetSimpleUser(
 		ctx.Binding(ctx.ShouldBindUri, &dto.SimpleUserReq{}).
 			Unwrap().(*dto.SimpleUserReq))
 }
 
 func (c *UserController) index(ctx *bingo.Context) (int, string, interface{}) {
-	return c.service.GetList(
+	return c.Service.GetList(
 		ctx.Binding(ctx.ShouldBind, &dto.UserReq{}).
 			Unwrap().(*dto.UserReq))
 }
@@ -71,7 +68,7 @@ func (c *UserController) log(ctx *bingo.Context) any {
 	req := &dto.UserLogReq{}
 	req.ID = id
 
-	return c.service.GetLog(
+	return c.Service.GetLog(
 		ctx.Binding(ctx.ShouldBind, req).
 			Unwrap().(*dto.UserLogReq))
 }

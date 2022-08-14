@@ -6,11 +6,12 @@ import (
 	"github.com/xylong/bingo/test/internal/domain/model/user"
 	"github.com/xylong/bingo/test/internal/domain/model/userLog"
 	"github.com/xylong/bingo/test/internal/infrastructure/dao/GormDao"
-	"github.com/xylong/bingo/test/internal/lib/db"
+	"gorm.io/gorm"
 )
 
 // UserRep 用户响应
 type UserRep struct {
+	DB *gorm.DB `inject:"-"`
 }
 
 // M2D_SimpleUser 模型转dto
@@ -52,7 +53,7 @@ func (r *UserRep) M2D_UserInfo(req *dto.UserLogReq, member *aggregation.Member) 
 	}
 
 	member.Log = userLog.New(userLog.WithUserID(member.User.ID))
-	member.Log.Dao = GormDao.NewUserLogDao(db.DB)
+	member.Log.Dao = GormDao.NewUserLogDao(r.DB)
 
 	info.Log = r.M2D_UserLogs(member.GetLog(req))
 	return info
