@@ -3,6 +3,7 @@ package bingo
 import (
 	"context"
 	"errors"
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/sirupsen/logrus"
 	"github.com/xylong/bingo/ioc"
@@ -32,6 +33,8 @@ func Init() *Bingo {
 		Engine: gin.New(),
 		expr:   make(map[string]interface{}),
 	}
+
+	ioc.Factory.Set(InitConfig())
 
 	return b
 }
@@ -109,8 +112,16 @@ func (b *Bingo) Crontab(cron string, expr interface{}) *Bingo {
 
 // Lunch 启动
 func (b *Bingo) Lunch() {
+	var (
+		port int = 8080
+	)
+
+	if config := ioc.Factory.Get((*Config)(nil)); config != nil {
+		port = config.(*Config).Server.Port
+	}
+
 	server := &http.Server{
-		Addr:    ":8080",
+		Addr:    fmt.Sprintf(":%d", port),
 		Handler: b.Engine,
 	}
 

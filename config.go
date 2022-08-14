@@ -1,9 +1,7 @@
 package bingo
 
 import (
-	"github.com/xylong/bingo/utils"
-	"gopkg.in/yaml.v2"
-	"log"
+	"github.com/spf13/viper"
 )
 
 // Config 配置
@@ -79,13 +77,19 @@ type MongoConfig struct {
 
 // InitConfig 初始化配置文件
 func InitConfig() *Config {
-	config := NewConfig()
+	v := viper.New()
+	v.AddConfigPath("./")
+	v.SetConfigName("config")
+	v.SetConfigType("yaml")
 
-	if bytes := utils.LoadFile("config.yaml"); bytes != nil {
-		if err := yaml.Unmarshal(bytes, config); err != nil {
-			log.Fatal(err)
-		}
+	if err := v.ReadInConfig(); err != nil {
+		panic(err)
 	}
 
-	return config
+	conf := NewConfig()
+	if err := viper.Unmarshal(conf); err != nil {
+		panic(err)
+	}
+
+	return conf
 }
