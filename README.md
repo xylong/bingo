@@ -118,12 +118,12 @@ type UserController struct {
 ### 使用
 ```go
 func main() {
-	bingo.Init().
-		Mount("v1", v1.Controllers...)(middleware.NewLogger(), middleware.NewValidate()).
+    bingo.Init().
+        Mount("v1", v1.Controllers...)(middleware.NewLogger(), middleware.NewValidate()).
         Group("v2", func(group *bingo.Group) {
             group.POST("logoff", v2.Login)
         }, middleware.NewCsrf()).
-		Lunch()
+        Lunch()
 }
 ```
 example在单元测试里
