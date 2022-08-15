@@ -1,6 +1,9 @@
 package config
 
 import (
+	"fmt"
+	"github.com/xylong/bingo"
+	"github.com/xylong/bingo/ioc"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
@@ -19,7 +22,15 @@ func NewAdapter() *Adapter {
 
 // Gorm 创建gorm
 func (a *Adapter) Gorm() *gorm.DB {
-	dsn := "root:123456@tcp(127.0.0.1:3306)/test?charset=utf8mb4&parseTime=True&loc=Local"
+	conf := ioc.Factory.Get((*bingo.Config)(nil))
+	if conf == nil {
+		return nil
+	}
+
+	mysqlConf := conf.(*bingo.Config).Mysql
+
+	dsn := fmt.Sprintf("%s:%s@tcp(%s:%d)/%s?charset=%s&parseTime=True&loc=Local",
+		mysqlConf.User, mysqlConf.Password, mysqlConf.Host, mysqlConf.Port, mysqlConf.DB, mysqlConf.Charset)
 
 	db, err := gorm.Open(mysql.New(mysql.Config{
 		DriverName:                "mysql",
