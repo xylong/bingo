@@ -79,7 +79,7 @@ func InitConfig() *Config {
 	}
 
 	conf.Section("Server", conf.Server)
-	conf.Section("Database", conf.Mysql)
+	conf.Section("Mysql", conf.Mysql)
 	conf.Section("Mongo", conf.Mongo)
 
 	return conf
