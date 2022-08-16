@@ -126,5 +126,4 @@ func main() {
         Lunch()
 }
 ```
-example在单元测试里
 
