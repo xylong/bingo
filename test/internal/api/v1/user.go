@@ -6,6 +6,7 @@ import (
 	"github.com/xylong/bingo/test/internal/application/dto"
 	"github.com/xylong/bingo/test/internal/application/service"
 	"github.com/xylong/bingo/test/internal/middleware"
+	"go.uber.org/zap"
 	"strconv"
 )
 
@@ -54,6 +55,7 @@ func (c *UserController) show(ctx *bingo.Context) any {
 }
 
 func (c *UserController) index(ctx *bingo.Context) (int, string, interface{}) {
+	zap.L().Warn("param error")
 	return c.Service.GetList(
 		ctx.Binding(ctx.ShouldBind, &dto.UserReq{}).
 			Unwrap().(*dto.UserReq))

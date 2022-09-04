@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/sirupsen/logrus"
+	"github.com/spf13/viper"
 	"github.com/xylong/bingo/ioc"
 	"log"
 	"net/http"
@@ -28,14 +29,37 @@ type Bingo struct {
 }
 
 // Init 初始化
-func Init() *Bingo {
+func Init(dir, filename string) *Bingo {
+	// 加载配置
+	if err := InitConfig(dir, filename); err != nil {
+		panic(err)
+	}
+
+	// 设置运行模式
+	if viper.IsSet("server.mode") {
+		gin.SetMode(viper.GetString("server.mode"))
+	} else {
+		gin.SetMode(gin.DebugMode)
+	}
+
+	// 日志
+	if err := InitLog(&LogConfig{
+		Level:      viper.GetString("log.level"),
+		FileName:   viper.GetString("log.filename"),
+		MaxSize:    viper.GetInt("log.max_size"),
+		MaxAge:     viper.GetInt("log.max_age"),
+		MaxBackups: viper.GetInt("log.max_backups"),
+		Compress:   viper.GetBool("log.compress"),
+	}); err != nil {
+		panic(err)
+	}
+
 	b := &Bingo{
 		Engine: gin.New(),
 		expr:   make(map[string]interface{}),
 	}
 
-	ioc.Factory.Set(InitConfig())
-
+	b.Use(GinRecovery(true))
 	return b
 }
 
@@ -112,12 +136,10 @@ func (b *Bingo) Crontab(cron string, expr interface{}) *Bingo {
 
 // Lunch 启动
 func (b *Bingo) Lunch() {
-	var (
-		port int = 8080
-	)
+	var port = 8080
 
-	if config := ioc.Factory.Get((*Config)(nil)); config != nil {
-		port = config.(*Config).Server.Port
+	if viper.IsSet("server.port") {
+		port = viper.GetInt("server.port")
 	}
 
 	server := &http.Server{

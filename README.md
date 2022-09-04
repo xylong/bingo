@@ -14,17 +14,16 @@ go get -u github.com/xylong/bingo
     - [ ] 全局中间件
     - [x] 分组中间件
     - [ ] 路由中间件
-- [ ] 日志
-    - [ ] 日志分割
+- [x] 日志
+    - [x] 日志分割
 - [x] ioc容器
     - [x] 依赖注入
 
 ### 相关库
 - [gin](https://github.com/gin-gonic/gin) http框架
-- [logrus](https://github.com/sirupsen/logrus) 日志
-- [gorm](gorm.io/gorm) orm
+- [zap](https://github.com/uber-go/zap) 日志
 - [squirrel](github.com/Masterminds/squirrel) sql拼装工具
-
+- [viper]()
 ****
 
 ### 路由

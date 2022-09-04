@@ -9,7 +9,7 @@ import (
 )
 
 func main() {
-	bingo.Init().
+	bingo.Init("conf", "config").
 		Inject(config.NewAdapter(), config.NewService()).
 		Mount("v1", v1.Controllers...)(middleware.NewLogger(), middleware.NewValidate()).
 		Mount("v2", v2.Controllers...)().

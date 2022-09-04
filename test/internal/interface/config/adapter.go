@@ -2,8 +2,7 @@ package config
 
 import (
 	"fmt"
-	"github.com/xylong/bingo"
-	"github.com/xylong/bingo/ioc"
+	"github.com/spf13/viper"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
@@ -22,15 +21,14 @@ func NewAdapter() *Adapter {
 
 // Gorm 创建gorm
 func (a *Adapter) Gorm() *gorm.DB {
-	conf := ioc.Factory.Get((*bingo.Config)(nil))
-	if conf == nil {
-		return nil
-	}
-
-	mysqlConf := conf.(*bingo.Config).Mysql
-
 	dsn := fmt.Sprintf("%s:%s@tcp(%s:%d)/%s?charset=%s&parseTime=True&loc=Local",
-		mysqlConf.User, mysqlConf.Password, mysqlConf.Host, mysqlConf.Port, mysqlConf.DB, mysqlConf.Charset)
+		viper.GetString("database.user"),
+		viper.GetString("database.password"),
+		viper.GetString("database.host"),
+		viper.GetInt("database.port"),
+		viper.GetString("database.db"),
+		viper.GetString("database.charset"),
+	)
 
 	db, err := gorm.Open(mysql.New(mysql.Config{
 		DriverName:                "mysql",
