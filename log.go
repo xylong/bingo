@@ -16,63 +16,77 @@ import (
 
 var logger *zap.Logger
 
-type LogConfig struct {
+// logConfig 日志配置
+type logConfig struct {
 	Level      string
 	FileName   string
 	MaxSize    int
 	MaxAge     int
 	MaxBackups int
 	Compress   bool
+	Json       bool
+}
+
+func newLogConfig() *logConfig {
+	config := new(logConfig)
+	if err := viper.UnmarshalKey("log", config); err != nil {
+		panic(err)
+	}
+
+	return config
+}
+
+// isDebug 是否为调试模式
+func (c *logConfig) isDebug() bool {
+	return gin.Mode() == gin.DebugMode
 }
 
 // getLevel 获取日志级别
-func (c *LogConfig) getLevel() zap.AtomicLevel {
-	level, mode := zap.NewAtomicLevel(), gin.DebugMode
+func (c *logConfig) getLevel() zap.AtomicLevel {
+	level := zap.NewAtomicLevel()
 
-	switch mode {
-	case "debug":
-		level.SetLevel(zapcore.DebugLevel)
-	case "info":
-		level.SetLevel(zapcore.InfoLevel)
-	case "warn":
-		level.SetLevel(zapcore.WarnLevel)
-	case "error":
-		level.SetLevel(zapcore.ErrorLevel)
-	default:
+	// 日志级别（调试模式下日志为调试级别）
+	if c.isDebug() == false {
+		switch c.Level {
+		case "info":
+			level.SetLevel(zapcore.InfoLevel)
+		case "warn":
+			level.SetLevel(zapcore.WarnLevel)
+		case "error":
+			level.SetLevel(zapcore.ErrorLevel)
+		default:
+			level.SetLevel(zap.DebugLevel)
+		}
+	} else {
 		level.SetLevel(zap.DebugLevel)
 	}
 
 	return level
 }
 
-// isDebugLevel 判断是否为debug级别
-func (c *LogConfig) isDebugLevel() bool {
-	return c.Level == gin.DebugMode
-}
-
-func InitLog(config *LogConfig) error {
+// Zap 初始化日志
+func Zap() {
+	config := newLogConfig()
 	writer := getLogWriter(config)
-	encoder := getEncoder()
+	encoder := getEncoder(config.Json)
 
 	core := zapcore.NewCore(encoder, zapcore.NewMultiWriteSyncer(writer...), config.getLevel())
 	logger = zap.New(core, zap.AddCaller(), zap.AddStacktrace(zap.WarnLevel)) // ⚠️级别开始记录堆栈信息
-
-	zap.ReplaceGlobals(logger)
-	return nil
+	zap.ReplaceGlobals(logger)                                                // 替换zap包中全局的logger实例，后续在其他包中只需使用zap.L()、zap.S()调用即可
 }
 
 // getEncoder 日志格式配置
-func getEncoder() zapcore.Encoder {
+func getEncoder(jsonFormat bool) zapcore.Encoder {
 	config := zap.NewProductionEncoderConfig()
 	config.EncodeLevel = zapcore.CapitalLevelEncoder
 	config.EncodeDuration = zapcore.SecondsDurationEncoder
 	config.EncodeCaller = zapcore.ShortCallerEncoder
 	config.EncodeTime = func(time time.Time, encoder zapcore.PrimitiveArrayEncoder) {
-		encoder.AppendString(time.Format("2006/01/02 15:04:05.000"))
+		encoder.AppendString(time.Format("2006-01-02 15:04:05.000"))
 	}
 
 	// 设置日志编码格式json、console
-	if viper.GetString("log.mode") == "json" {
+	if jsonFormat {
 		return zapcore.NewJSONEncoder(config)
 	}
 
@@ -80,7 +94,7 @@ func getEncoder() zapcore.Encoder {
 }
 
 // getLogWriter 日志写入
-func getLogWriter(config *LogConfig) []zapcore.WriteSyncer {
+func getLogWriter(config *logConfig) []zapcore.WriteSyncer {
 	// 日志分割
 	hook := &lumberjack.Logger{
 		Filename:   config.FileName,
@@ -92,7 +106,7 @@ func getLogWriter(config *LogConfig) []zapcore.WriteSyncer {
 
 	writer := []zapcore.WriteSyncer{zapcore.AddSync(hook)}
 	// 如果是debug模式输出到控制台
-	if config.isDebugLevel() {
+	if config.isDebug() {
 		writer = append(writer, zapcore.AddSync(os.Stdout))
 	}
 

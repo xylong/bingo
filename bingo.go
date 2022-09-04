@@ -42,17 +42,7 @@ func Init(dir, filename string) *Bingo {
 		gin.SetMode(gin.DebugMode)
 	}
 
-	// 日志
-	if err := InitLog(&LogConfig{
-		Level:      viper.GetString("log.level"),
-		FileName:   viper.GetString("log.filename"),
-		MaxSize:    viper.GetInt("log.max_size"),
-		MaxAge:     viper.GetInt("log.max_age"),
-		MaxBackups: viper.GetInt("log.max_backups"),
-		Compress:   viper.GetBool("log.compress"),
-	}); err != nil {
-		panic(err)
-	}
+	Zap() // 初始化zap日志
 
 	b := &Bingo{
 		Engine: gin.New(),
@@ -137,7 +127,6 @@ func (b *Bingo) Crontab(cron string, expr interface{}) *Bingo {
 // Lunch 启动
 func (b *Bingo) Lunch() {
 	var port = 8080
-
 	if viper.IsSet("server.port") {
 		port = viper.GetInt("server.port")
 	}
