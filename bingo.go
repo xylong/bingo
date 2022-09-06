@@ -5,10 +5,9 @@ import (
 	"errors"
 	"fmt"
 	"github.com/gin-gonic/gin"
-	"github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
 	"github.com/xylong/bingo/ioc"
-	"log"
+	"go.uber.org/zap"
 	"net/http"
 	"os"
 	"os/signal"
@@ -112,13 +111,13 @@ func (b *Bingo) Crontab(cron string, expr interface{}) *Bingo {
 	case string:
 		_, err = getCron().AddFunc(cron, func() {
 			if _, err := ExecExpr(Expr(value), b.expr); err != nil {
-				logrus.Error(err.Error())
+				zap.L().Error("crontab express error", zap.Error(err))
 			}
 		})
 	}
 
 	if err != nil {
-		logrus.Error(err.Error())
+		zap.L().Error("crontab error", zap.Error(err))
 	}
 
 	return b
@@ -140,23 +139,25 @@ func (b *Bingo) Lunch() {
 
 	go func() {
 		if err := server.ListenAndServe(); err != nil && errors.Is(err, http.ErrServerClosed) {
-			logrus.Info("http server closed")
+			zap.S().Errorf("http listen %d: %s\n", port, err)
 		}
 	}()
 
 	getCron().Start()
 
+	// 等待中断信号来优雅地关闭服务器
 	quit := make(chan os.Signal)
 	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
 	<-quit
-	logrus.Info("Shutting down server...")
+	zap.L().Info("shutting down server...")
 
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
+	// 5秒内优雅关闭服务（将未处理完的请求处理完再关闭服务），超过5秒就超时退出
 	if err := server.Shutdown(ctx); err != nil {
-		logrus.Info("Server forced to shutdown:", err)
+		zap.L().Error("server forced to shutdown:", zap.Error(err))
 	}
 
-	log.Println("Server exiting")
+	zap.L().Info("server exiting")
 }

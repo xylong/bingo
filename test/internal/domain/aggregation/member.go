@@ -1,7 +1,6 @@
 package aggregation
 
 import (
-	"github.com/sirupsen/logrus"
 	"github.com/xylong/bingo/test/internal/application/dto"
 	"github.com/xylong/bingo/test/internal/domain"
 	"github.com/xylong/bingo/test/internal/domain/model/profile"
@@ -9,6 +8,7 @@ import (
 	"github.com/xylong/bingo/test/internal/domain/model/userLog"
 	"github.com/xylong/bingo/test/internal/domain/repository"
 	. "github.com/xylong/bingo/test/internal/infrastructure/error"
+	"go.uber.org/zap"
 )
 
 // Member 会员
@@ -110,7 +110,7 @@ func (m *Member) GetUsers(req *dto.UserReq) ([]*user.User, error) {
 
 func (m *Member) GetUser() error {
 	if err := m.User.Single(); err != nil {
-		logrus.Error(err.Error())
+		zap.L().Error("get user err", zap.Error(err))
 		return NewNotFoundError(NotFoundData, "用户查询失败")
 	}
 
@@ -121,7 +121,7 @@ func (m *Member) GetUser() error {
 func (m *Member) GetLog(req *dto.UserLogReq) []*userLog.UserLog {
 	logs, err := m.Log.Get(req)
 	if err != nil {
-		logrus.Error(err.Error())
+		zap.L().Error("get user log error", zap.Error(err))
 	}
 
 	return logs

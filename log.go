@@ -2,14 +2,18 @@ package bingo
 
 import (
 	"github.com/gin-gonic/gin"
+	rotatelogs "github.com/lestrrat-go/file-rotatelogs"
 	"github.com/spf13/viper"
+	"github.com/xylong/bingo/utils"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 	"gopkg.in/natefinch/lumberjack.v2"
+	"io"
 	"net/http"
 	"net/http/httputil"
 	"os"
 	"runtime/debug"
+	"strconv"
 	"strings"
 	"time"
 )
@@ -25,6 +29,7 @@ type logConfig struct {
 	MaxBackups int
 	Compress   bool
 	Json       bool
+	Duration   int // 时间间隔
 }
 
 func newLogConfig() *logConfig {
@@ -95,22 +100,50 @@ func getEncoder(jsonFormat bool) zapcore.Encoder {
 
 // getLogWriter 日志写入
 func getLogWriter(config *logConfig) []zapcore.WriteSyncer {
-	// 日志分割
-	hook := &lumberjack.Logger{
-		Filename:   config.FileName,
-		MaxSize:    config.MaxSize,
-		MaxBackups: config.MaxBackups,
-		MaxAge:     config.MaxAge,
-		Compress:   config.Compress,
+	var (
+		writer   io.Writer
+		filename string
+	)
+
+	if index := strings.Index(config.FileName, "."); index != -1 {
+		var format string
+
+		switch duration := time.Duration(config.Duration / 60); {
+		case duration >= time.Hour*24:
+			format = "%Y%m%d"
+		case duration == time.Hour:
+			format = "%Y%m%d%H"
+		default:
+			format = "%Y%m%d" + utils.ZeroFill(strconv.Itoa(utils.Ceil(time.Now().Hour()*60, config.Duration)), 3, true)
+		}
+
+		filename = config.FileName[0:index] + format + config.FileName[index:]
 	}
 
-	writer := []zapcore.WriteSyncer{zapcore.AddSync(hook)}
+	if config.Duration > 0 {
+		writer, _ = rotatelogs.New(
+			filename,
+			rotatelogs.WithMaxAge(time.Duration(config.MaxSize)*time.Hour),
+			rotatelogs.WithRotationTime(time.Minute*time.Duration(config.Duration)),
+		)
+	} else {
+		writer = &lumberjack.Logger{
+			Filename:   filename,
+			MaxSize:    config.MaxSize,
+			MaxBackups: config.MaxBackups,
+			MaxAge:     config.MaxAge,
+			Compress:   config.Compress,
+		}
+	}
+
+	// 日志分割
+	syncer := []zapcore.WriteSyncer{zapcore.AddSync(writer)}
 	// 如果是debug模式输出到控制台
 	if config.isDebug() {
-		writer = append(writer, zapcore.AddSync(os.Stdout))
+		syncer = append(syncer, zapcore.AddSync(os.Stdout))
 	}
 
-	return writer
+	return syncer
 }
 
 // GinRecovery 代替gin的默认recovery

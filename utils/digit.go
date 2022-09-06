@@ -57,3 +57,12 @@ func IsNumeric(val interface{}) bool {
 
 	return false
 }
+
+// Ceil 向上取整
+func Ceil(a, b int) int {
+	if a == 0 || b == 0 {
+		return 0
+	}
+
+	return (a + b - 1) / b
+}

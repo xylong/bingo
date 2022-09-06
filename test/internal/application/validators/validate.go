@@ -3,8 +3,8 @@ package validators
 import (
 	"github.com/gin-gonic/gin/binding"
 	"github.com/go-playground/validator/v10"
-	"github.com/sirupsen/logrus"
 	"github.com/xylong/bingo"
+	"go.uber.org/zap"
 )
 
 var (
@@ -15,7 +15,7 @@ func init() {
 	if v, ok := binding.Validator.Engine().(*validator.Validate); ok {
 		valid = v
 	} else {
-		logrus.Fatal("error validator ")
+		zap.L().Fatal("error validator")
 	}
 
 	bingo.RegisterBindTag("phone", CheckPhone)

@@ -3,7 +3,7 @@ package bingo
 import (
 	"github.com/gin-gonic/gin/binding"
 	"github.com/go-playground/validator/v10"
-	"github.com/sirupsen/logrus"
+	"go.uber.org/zap"
 )
 
 var (
@@ -20,7 +20,7 @@ func init() {
 	if engine, ok := binding.Validator.Engine().(*validator.Validate); ok {
 		v = engine
 	} else {
-		logrus.Fatal("error validator")
+		zap.L().Error("error validator")
 	}
 }
 
