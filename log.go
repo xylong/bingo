@@ -18,6 +18,11 @@ import (
 	"time"
 )
 
+const (
+	hourMinutes = 60
+	dayMinutes  = hourMinutes * 24
+)
+
 var logger *zap.Logger
 
 // logConfig 日志配置
@@ -109,9 +114,9 @@ func getLogWriter(config *logConfig) []zapcore.WriteSyncer {
 		var format string
 
 		switch duration := time.Duration(config.Duration / 60); {
-		case duration >= time.Hour*24:
+		case duration >= dayMinutes:
 			format = "%Y%m%d"
-		case duration == time.Hour:
+		case duration == hourMinutes:
 			format = "%Y%m%d%H"
 		default:
 			format = "%Y%m%d" + utils.ZeroFill(strconv.Itoa(utils.Ceil(time.Now().Hour()*60, config.Duration)), 3, true)
