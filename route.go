@@ -24,6 +24,11 @@ func (g Group) Group(group string, callback func(*Group), middleware ...Middlewa
 	callback(&g)
 }
 
+// HEAD head请求
+func (g *Group) HEAD(relativePath string, handler interface{}) {
+	g.handle(http.MethodHead, relativePath, handler)
+}
+
 // GET get请求
 func (g *Group) GET(relativePath string, handler interface{}) {
 	g.handle(http.MethodGet, relativePath, handler)
@@ -41,12 +46,28 @@ func (g *Group) PUT(relativePath string, handler interface{}) {
 
 // PATCH patch请求
 func (g *Group) PATCH(relativePath string, handler interface{}) {
-	g.handle(http.MethodPut, relativePath, handler)
+	g.handle(http.MethodPatch, relativePath, handler)
 }
 
 // DELETE delete请求
 func (g *Group) DELETE(relativePath string, handler interface{}) {
 	g.handle(http.MethodDelete, relativePath, handler)
+}
+
+// OPTIONS option请求
+func (g *Group) OPTIONS(relativePath string, handler interface{}) {
+	g.handle(http.MethodOptions, relativePath, handler)
+}
+
+// ANY 任意请求方式
+func (g *Group) ANY(relativePath string, handler interface{}) {
+	g.HEAD(relativePath, handler)
+	g.GET(relativePath, handler)
+	g.POST(relativePath, handler)
+	g.PUT(relativePath, handler)
+	g.PATCH(relativePath, handler)
+	g.DELETE(relativePath, handler)
+	g.OPTIONS(relativePath, handler)
 }
 
 func (g *Group) handle(httpMethod, relativePath string, handler interface{}) {

@@ -113,10 +113,10 @@ func getLogWriter(config *logConfig) []zapcore.WriteSyncer {
 	if index := strings.Index(config.FileName, "."); index != -1 {
 		var format string
 
-		switch duration := time.Duration(config.Duration / 60); {
-		case duration >= dayMinutes:
+		switch {
+		case config.Duration >= dayMinutes:
 			format = "%Y%m%d"
-		case duration == hourMinutes:
+		case config.Duration == hourMinutes:
 			format = "%Y%m%d%H"
 		default:
 			format = "%Y%m%d" + utils.ZeroFill(strconv.Itoa(utils.Ceil(time.Now().Hour()*60, config.Duration)), 3, true)
