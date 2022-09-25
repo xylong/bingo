@@ -14,8 +14,7 @@ func NewErrorResult(data interface{}, err error) *ErrorResult {
 // 如果执行有错误则抛出错误，否则返回执行结果
 func (r *ErrorResult) Unwrap() interface{} {
 	if r.err != nil {
-		message(r.err)
-		panic(r.err.Error())
+		panic(message(r.err))
 	}
 
 	return r.data
