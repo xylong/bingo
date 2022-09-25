@@ -24,6 +24,9 @@ func (v *Validate) Before(ctx *bingo.Context) error {
 		}
 	}()
 
-	ctx.Next()
 	return nil
+}
+
+func (v *Validate) After(data interface{}) (interface{}, error) {
+	return data, nil
 }

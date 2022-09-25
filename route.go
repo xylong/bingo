@@ -73,7 +73,7 @@ func (g *Group) ANY(relativePath string, handler interface{}) {
 func (g *Group) handle(httpMethod, relativePath string, handler interface{}) {
 	if f := convert(handler); f != nil {
 		g.Handle(httpMethod, strings.Trim(g.group+"/"+relativePath, "/"), func(context *gin.Context) {
-			g.middlewares.before(NewContext(context))
+			context.Set(satellite, g.middlewares)
 		}, f)
 	}
 }

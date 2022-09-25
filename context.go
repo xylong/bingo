@@ -4,6 +4,10 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+const (
+	satellite = "middleware"
+)
+
 // Context 上下文
 type Context struct {
 	*gin.Context

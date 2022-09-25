@@ -27,37 +27,46 @@ type (
 
 func (r apiResponder) Return() gin.HandlerFunc {
 	return func(context *gin.Context) {
-		code, message, data := r(NewContext(context))
-
-		echo := gin.H{
-			"code":    code,
-			"message": message,
-			"data":    data,
-		}
-
-		if code == 0 {
-			context.JSON(http.StatusOK, echo)
+		if v, exists := context.Get(satellite); exists {
+			context.JSON(http.StatusOK, v.(middlewares).handle(NewContext(context), r).(gin.H))
 		} else {
-			context.AbortWithStatusJSON(http.StatusBadRequest, echo)
+			code, message, data := r(NewContext(context))
+			context.JSON(http.StatusOK, gin.H{
+				"code":    code,
+				"message": message,
+				"data":    data,
+			})
 		}
 	}
 }
 
 func (r stringResponder) Return() gin.HandlerFunc {
 	return func(context *gin.Context) {
-		context.String(http.StatusOK, r(NewContext(context)))
+		if v, exists := context.Get(satellite); exists {
+			context.String(http.StatusOK, v.(middlewares).handle(NewContext(context), r).(string))
+		} else {
+			context.String(http.StatusOK, r(NewContext(context)))
+		}
 	}
 }
 
 func (r jsonResponder) Return() gin.HandlerFunc {
 	return func(context *gin.Context) {
-		context.JSON(http.StatusOK, r(NewContext(context)))
+		if v, exists := context.Get(satellite); exists {
+			context.JSON(http.StatusOK, v.(middlewares).handle(NewContext(context), r).(any))
+		} else {
+			context.JSON(http.StatusOK, r(NewContext(context)))
+		}
 	}
 }
 
 func (r defaultResponder) Return() gin.HandlerFunc {
 	return func(context *gin.Context) {
-		r(NewContext(context))
+		if v, exists := context.Get(satellite); exists {
+			v.(middlewares).handle(NewContext(context), r)
+		} else {
+			r(NewContext(context))
+		}
 	}
 }
 
