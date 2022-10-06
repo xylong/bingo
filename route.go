@@ -17,11 +17,49 @@ func NewGroup(routerGroup *gin.RouterGroup) *Group {
 	return &Group{RouterGroup: routerGroup}
 }
 
+// Without 分组路由排除指定中间件
+func (g Group) Without(callback func(*Group), m ...Middleware) {
+	var arr middlewares
+
+	for _, middleware := range m {
+		for _, m2 := range g.middlewares {
+			if middleware != m2 {
+				arr = append(arr, m2)
+			}
+		}
+	}
+
+	g.middlewares = arr
+	callback(&g)
+}
+
 // Group 路由分组
 func (g Group) Group(group string, callback func(*Group), middleware ...Middleware) {
-	g.middlewares = append(g.middlewares, middleware...)
+	g.middleware(middleware...)
 	g.group += group + "/"
 	callback(&g)
+}
+
+// middleware 路由分组绑定中间件
+func (g *Group) middleware(m ...Middleware) {
+	if m == nil || len(m) == 0 {
+		return
+	}
+
+	for _, middleware := range m {
+		exist := false
+
+		for _, m2 := range g.middlewares {
+			if middleware == m2 {
+				exist = true
+				break
+			}
+		}
+
+		if !exist {
+			g.middlewares = append(g.middlewares, middleware)
+		}
+	}
 }
 
 // HEAD head请求

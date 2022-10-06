@@ -13,6 +13,17 @@ type Middleware interface {
 
 type middlewares []Middleware
 
+func (m middlewares) remove(me Middleware) {
+	index := 0
+
+	for _, middleware := range m {
+		if middleware != me {
+			m[index] = middleware
+			index++
+		}
+	}
+}
+
 func (m middlewares) before(ctx *Context) {
 	for _, f := range m {
 		if err := f.Before(ctx); err != nil {

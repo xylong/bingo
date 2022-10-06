@@ -65,7 +65,7 @@ func (b *Bingo) Mount(group string, controller ...Controller) func(middleware ..
 
 	return func(middleware ...Middleware) *Bingo {
 		for _, c := range controller {
-			g.middlewares = append(g.middlewares, middleware...)
+			g.middleware(middleware...)
 			c.Route(g)
 			b.joinBean(c) // 将控制器加入容器
 		}
