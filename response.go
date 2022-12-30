@@ -28,9 +28,9 @@ type (
 func (r apiResponder) Return() gin.HandlerFunc {
 	return func(context *gin.Context) {
 		if v, exists := context.Get(satellite); exists {
-			context.JSON(http.StatusOK, v.(middlewares).handle(NewContext(context), r).(gin.H))
+			context.JSON(http.StatusOK, v.(middlewares).handle(bingoContext(context), r).(gin.H))
 		} else {
-			code, message, data := r(NewContext(context))
+			code, message, data := r(bingoContext(context))
 			context.JSON(http.StatusOK, gin.H{
 				"code":    code,
 				"message": message,
@@ -43,9 +43,9 @@ func (r apiResponder) Return() gin.HandlerFunc {
 func (r stringResponder) Return() gin.HandlerFunc {
 	return func(context *gin.Context) {
 		if v, exists := context.Get(satellite); exists {
-			context.String(http.StatusOK, v.(middlewares).handle(NewContext(context), r).(string))
+			context.String(http.StatusOK, v.(middlewares).handle(bingoContext(context), r).(string))
 		} else {
-			context.String(http.StatusOK, r(NewContext(context)))
+			context.String(http.StatusOK, r(bingoContext(context)))
 		}
 	}
 }
@@ -53,9 +53,9 @@ func (r stringResponder) Return() gin.HandlerFunc {
 func (r jsonResponder) Return() gin.HandlerFunc {
 	return func(context *gin.Context) {
 		if v, exists := context.Get(satellite); exists {
-			context.JSON(http.StatusOK, v.(middlewares).handle(NewContext(context), r).(any))
+			context.JSON(http.StatusOK, v.(middlewares).handle(bingoContext(context), r).(any))
 		} else {
-			context.JSON(http.StatusOK, r(NewContext(context)))
+			context.JSON(http.StatusOK, r(bingoContext(context)))
 		}
 	}
 }
@@ -63,9 +63,9 @@ func (r jsonResponder) Return() gin.HandlerFunc {
 func (r defaultResponder) Return() gin.HandlerFunc {
 	return func(context *gin.Context) {
 		if v, exists := context.Get(satellite); exists {
-			v.(middlewares).handle(NewContext(context), r)
+			v.(middlewares).handle(bingoContext(context), r)
 		} else {
-			r(NewContext(context))
+			r(bingoContext(context))
 		}
 	}
 }

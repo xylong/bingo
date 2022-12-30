@@ -81,8 +81,8 @@ func Zap() {
 	encoder := getEncoder(config.Json)
 
 	core := zapcore.NewCore(encoder, zapcore.NewMultiWriteSyncer(writer...), config.getLevel())
-	logger = zap.New(core, zap.AddCaller(), zap.AddStacktrace(zap.WarnLevel)) // ⚠️级别开始记录堆栈信息
-	zap.ReplaceGlobals(logger)                                                // 替换zap包中全局的logger实例，后续在其他包中只需使用zap.L()、zap.S()调用即可
+	logger = zap.New(core, zap.AddCaller(), zap.AddStacktrace(zap.ErrorLevel)) // 错误级别开始记录堆栈信息
+	zap.ReplaceGlobals(logger)                                                 // 替换zap包中全局的logger实例，后续在其他包中只需使用zap.L()、zap.S()调用即可
 }
 
 // getEncoder 日志格式配置
