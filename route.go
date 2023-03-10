@@ -2,6 +2,7 @@ package bingo
 
 import (
 	"github.com/gin-gonic/gin"
+	"github.com/xylong/bingo/iface"
 	"net/http"
 	"strings"
 )
@@ -18,7 +19,7 @@ func NewGroup(routerGroup *gin.RouterGroup) *Group {
 }
 
 // Without 分组路由排除指定中间件
-func (g Group) Without(callback func(*Group), m ...Middleware) {
+func (g Group) Without(callback func(*Group), m ...iface.Middleware) {
 	var arr middlewares
 
 	for _, middleware := range m {
@@ -34,33 +35,52 @@ func (g Group) Without(callback func(*Group), m ...Middleware) {
 }
 
 // Group 路由分组
-func (g Group) Group(group string, callback func(*Group), middleware ...Middleware) {
-	g.middleware(middleware...)
+func (g Group) Group(group string, callback func(*Group), middleware ...iface.Middleware) {
+	g.attach(middleware...)
 	g.group += group + "/"
 	callback(&g)
 }
 
-// middleware 路由分组绑定中间件
-func (g *Group) middleware(m ...Middleware) {
-	if m == nil || len(m) == 0 {
-		return
-	}
-
-	for _, middleware := range m {
-		exist := false
-
-		for _, m2 := range g.middlewares {
-			if middleware == m2 {
-				exist = true
-				break
+func (g *Group) attach(middlewares ...iface.Middleware) {
+loop:
+	for _, middleware := range middlewares {
+		// 跳过重复中间件
+		for _, m := range g.middlewares {
+			if middleware == m {
+				continue loop
 			}
 		}
 
-		if !exist {
-			g.middlewares = append(g.middlewares, middleware)
-		}
+		g.Use(func(context *gin.Context) {
+			_ = middleware.Before(context)
+			context.Next()
+		})
+
+		g.middlewares = append(g.middlewares, middleware)
 	}
 }
+
+// middleware 路由分组绑定中间件
+//func (g *Group) middleware(m ...Middleware) {
+//	if m == nil || len(m) == 0 {
+//		return
+//	}
+//
+//	for _, middleware := range m {
+//		exist := false
+//
+//		for _, m2 := range g.middlewares {
+//			if middleware == m2 {
+//				exist = true
+//				break
+//			}
+//		}
+//
+//		if !exist {
+//			g.middlewares = append(g.middlewares, middleware)
+//		}
+//	}
+//}
 
 // HEAD head请求
 func (g *Group) HEAD(relativePath string, handler interface{}) {
@@ -110,8 +130,6 @@ func (g *Group) ANY(relativePath string, handler interface{}) {
 
 func (g *Group) handle(httpMethod, relativePath string, handler interface{}) {
 	if f := convert(handler); f != nil {
-		g.Handle(httpMethod, strings.Trim(g.group+"/"+relativePath, "/"), func(context *gin.Context) {
-			context.Set("middleware", g.middlewares)
-		}, f)
+		g.Handle(httpMethod, strings.Trim(g.group+"/"+relativePath, "/"), f)
 	}
 }

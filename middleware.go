@@ -5,15 +5,9 @@ import (
 	"github.com/xylong/bingo/iface"
 )
 
-// Middleware 中间件
-type Middleware interface {
-	Before(ctx *gin.Context) error
-	After(interface{}) (interface{}, error)
-}
+type middlewares []iface.Middleware
 
-type middlewares []Middleware
-
-func (m middlewares) remove(me Middleware) {
+func (m middlewares) remove(me iface.Middleware) {
 	index := 0
 
 	for _, middleware := range m {

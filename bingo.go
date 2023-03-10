@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/spf13/viper"
+	"github.com/xylong/bingo/iface"
 	"github.com/xylong/bingo/ioc"
 	"go.uber.org/zap"
 	"net/http"
@@ -59,13 +60,13 @@ func (b *Bingo) Route(group string, callback func(group *Group)) *Bingo {
 }
 
 // Mount 挂载控制器
-func (b *Bingo) Mount(group string, controller ...Controller) func(middleware ...Middleware) *Bingo {
+func (b *Bingo) Mount(group string, controller ...Controller) func(middleware ...iface.Middleware) *Bingo {
 	b.group = b.Group(group)
 	g := NewGroup(b.group)
 
-	return func(middleware ...Middleware) *Bingo {
+	return func(middleware ...iface.Middleware) *Bingo {
 		for _, c := range controller {
-			g.middleware(middleware...)
+			g.attach(middleware...)
 			c.Route(g)
 			b.joinBean(c) // 将控制器加入容器
 		}
