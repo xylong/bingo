@@ -19,18 +19,18 @@ func init() {
 }
 
 type (
-	apiResponder     func(*Context) (int, string, interface{})
-	stringResponder  func(*Context) string
-	jsonResponder    func(*Context) any
-	defaultResponder func(*Context)
+	apiResponder     func(*gin.Context) (int, string, interface{})
+	stringResponder  func(*gin.Context) string
+	jsonResponder    func(*gin.Context) any
+	defaultResponder func(*gin.Context)
 )
 
 func (r apiResponder) Return() gin.HandlerFunc {
 	return func(context *gin.Context) {
-		if v, exists := context.Get(satellite); exists {
-			context.JSON(http.StatusOK, v.(middlewares).handle(bingoContext(context), r).(gin.H))
+		if v, exists := context.Get("middleware"); exists {
+			context.JSON(http.StatusOK, v.(middlewares).handle(context, r).(gin.H))
 		} else {
-			code, message, data := r(bingoContext(context))
+			code, message, data := r(context)
 			context.JSON(http.StatusOK, gin.H{
 				"code":    code,
 				"message": message,
@@ -42,30 +42,30 @@ func (r apiResponder) Return() gin.HandlerFunc {
 
 func (r stringResponder) Return() gin.HandlerFunc {
 	return func(context *gin.Context) {
-		if v, exists := context.Get(satellite); exists {
-			context.String(http.StatusOK, v.(middlewares).handle(bingoContext(context), r).(string))
+		if v, exists := context.Get("middleware"); exists {
+			context.String(http.StatusOK, v.(middlewares).handle(context, r).(string))
 		} else {
-			context.String(http.StatusOK, r(bingoContext(context)))
+			context.String(http.StatusOK, r(context))
 		}
 	}
 }
 
 func (r jsonResponder) Return() gin.HandlerFunc {
 	return func(context *gin.Context) {
-		if v, exists := context.Get(satellite); exists {
-			context.JSON(http.StatusOK, v.(middlewares).handle(bingoContext(context), r).(any))
+		if v, exists := context.Get("middleware"); exists {
+			context.JSON(http.StatusOK, v.(middlewares).handle(context, r).(any))
 		} else {
-			context.JSON(http.StatusOK, r(bingoContext(context)))
+			context.JSON(http.StatusOK, r(context))
 		}
 	}
 }
 
 func (r defaultResponder) Return() gin.HandlerFunc {
 	return func(context *gin.Context) {
-		if v, exists := context.Get(satellite); exists {
-			v.(middlewares).handle(bingoContext(context), r)
+		if v, exists := context.Get("middleware"); exists {
+			v.(middlewares).handle(context, r)
 		} else {
-			r(bingoContext(context))
+			r(context)
 		}
 	}
 }

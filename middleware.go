@@ -7,7 +7,7 @@ import (
 
 // Middleware 中间件
 type Middleware interface {
-	Before(ctx *Context) error
+	Before(ctx *gin.Context) error
 	After(interface{}) (interface{}, error)
 }
 
@@ -24,7 +24,7 @@ func (m middlewares) remove(me Middleware) {
 	}
 }
 
-func (m middlewares) before(ctx *Context) {
+func (m middlewares) before(ctx *gin.Context) {
 	for _, f := range m {
 		if err := f.Before(ctx); err != nil {
 			panic(err)
@@ -32,7 +32,7 @@ func (m middlewares) before(ctx *Context) {
 	}
 }
 
-func (m middlewares) after(ctx *Context, data interface{}) interface{} {
+func (m middlewares) after(ctx *gin.Context, data interface{}) interface{} {
 	for i := len(m) - 1; i >= 0; i-- {
 		if result, err := m[i].After(data); err != nil {
 			panic(err)
@@ -45,7 +45,7 @@ func (m middlewares) after(ctx *Context, data interface{}) interface{} {
 }
 
 // handle 处理前置中间件和后置中间件
-func (m middlewares) handle(ctx *Context, responder iface.Responder) (result interface{}) {
+func (m middlewares) handle(ctx *gin.Context, responder iface.Responder) (result interface{}) {
 	m.before(ctx)
 
 	switch responder.(type) {

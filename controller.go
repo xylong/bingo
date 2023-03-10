@@ -13,8 +13,8 @@ type Controller interface {
 
 // Bind 参数绑定
 type Bind[T any] struct {
-	try   func(ctx *Context, t *T) any
-	catch func(ctx *Context, err error)
+	try   func(ctx *gin.Context, t *T) any
+	catch func(ctx *gin.Context, err error)
 }
 
 func NewBind[T any]() *Bind[T] {
@@ -22,17 +22,17 @@ func NewBind[T any]() *Bind[T] {
 }
 
 // Try 参数绑定验证通过执行
-func (b *Bind[T]) Try(f func(ctx *Context, t *T) any) *Bind[T] {
+func (b *Bind[T]) Try(f func(ctx *gin.Context, t *T) any) *Bind[T] {
 	b.try = f
 	return b
 }
 
 // Catch 失败执行
-func (b *Bind[T]) Catch(f ...func(ctx *Context, err error)) *Bind[T] {
+func (b *Bind[T]) Catch(f ...func(ctx *gin.Context, err error)) *Bind[T] {
 	if len(f) > 0 {
 		b.catch = f[0]
 	} else {
-		b.catch = func(ctx *Context, err error) {
+		b.catch = func(ctx *gin.Context, err error) {
 			ctx.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		}
 	}
@@ -41,8 +41,8 @@ func (b *Bind[T]) Catch(f ...func(ctx *Context, err error)) *Bind[T] {
 }
 
 // Complete 完成调用
-func (b *Bind[T]) Complete() func(ctx *Context) any {
-	return func(ctx *Context) any {
+func (b *Bind[T]) Complete() func(ctx *gin.Context) any {
+	return func(ctx *gin.Context) any {
 		var t T
 
 		if err := ctx.ShouldBind(&t); err != nil {
