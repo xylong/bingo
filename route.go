@@ -41,6 +41,8 @@ func (g Group) Group(group string, callback func(*Group), middleware ...iface.Mi
 	callback(&g)
 }
 
+// 挂载中间件
+// 级联路由由外向内依次挂载中间件
 func (g *Group) attach(middlewares ...iface.Middleware) {
 loop:
 	for _, middleware := range middlewares {
@@ -51,36 +53,16 @@ loop:
 			}
 		}
 
+		middleware := middleware // 防止中间件覆盖
 		g.Use(func(context *gin.Context) {
 			_ = middleware.Before(context)
 			context.Next()
 		})
 
+		// 记录使用过的中间件
 		g.middlewares = append(g.middlewares, middleware)
 	}
 }
-
-// middleware 路由分组绑定中间件
-//func (g *Group) middleware(m ...Middleware) {
-//	if m == nil || len(m) == 0 {
-//		return
-//	}
-//
-//	for _, middleware := range m {
-//		exist := false
-//
-//		for _, m2 := range g.middlewares {
-//			if middleware == m2 {
-//				exist = true
-//				break
-//			}
-//		}
-//
-//		if !exist {
-//			g.middlewares = append(g.middlewares, middleware)
-//		}
-//	}
-//}
 
 // HEAD head请求
 func (g *Group) HEAD(relativePath string, handler interface{}) {

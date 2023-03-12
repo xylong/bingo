@@ -18,13 +18,13 @@ func (m middlewares) remove(me iface.Middleware) {
 	}
 }
 
-func (m middlewares) before(ctx *gin.Context) {
-	for _, f := range m {
-		if err := f.Before(ctx); err != nil {
-			panic(err)
-		}
-	}
-}
+//func (m middlewares) before(ctx *gin.Context) {
+//	for _, f := range m {
+//		if err := f.Before(ctx); err != nil {
+//			panic(err)
+//		}
+//	}
+//}
 
 func (m middlewares) after(ctx *gin.Context, data interface{}) interface{} {
 	for i := len(m) - 1; i >= 0; i-- {
@@ -40,7 +40,7 @@ func (m middlewares) after(ctx *gin.Context, data interface{}) interface{} {
 
 // handle 处理前置中间件和后置中间件
 func (m middlewares) handle(ctx *gin.Context, responder iface.Responder) (result interface{}) {
-	m.before(ctx)
+	//m.before(ctx)
 
 	switch responder.(type) {
 	case apiResponder:
