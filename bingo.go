@@ -5,7 +5,6 @@ import (
 	"errors"
 	"fmt"
 	"github.com/gin-gonic/gin"
-	"github.com/spf13/viper"
 	"github.com/xylong/bingo/iface"
 	"github.com/xylong/bingo/ioc"
 	"go.uber.org/zap"
@@ -29,27 +28,12 @@ type Bingo struct {
 }
 
 // Init 初始化
-func Init(dir, filename string) *Bingo {
-	// 加载配置
-	if err := InitConfig(dir, filename); err != nil {
-		panic(err)
-	}
-
-	// 设置运行模式
-	if viper.IsSet("server.mode") {
-		gin.SetMode(viper.GetString("server.mode"))
-	} else {
-		gin.SetMode(gin.DebugMode)
-	}
-
-	Zap() // 初始化zap日志
-
+func Init() *Bingo {
 	b := &Bingo{
 		Engine: gin.New(),
 		expr:   make(map[string]interface{}),
 	}
 
-	b.Use(GinRecovery(true))
 	return b
 }
 
@@ -125,12 +109,7 @@ func (b *Bingo) Crontab(cron string, expr interface{}) *Bingo {
 }
 
 // Lunch 启动
-func (b *Bingo) Lunch() {
-	var port = 8080
-	if viper.IsSet("server.port") {
-		port = viper.GetInt("server.port")
-	}
-
+func (b *Bingo) Lunch(port int) {
 	server := &http.Server{
 		Addr:    fmt.Sprintf(":%d", port),
 		Handler: b.Engine,
@@ -150,15 +129,15 @@ func (b *Bingo) Lunch() {
 	quit := make(chan os.Signal)
 	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
 	<-quit
-	zap.L().Info("shutting down server...")
+	fmt.Println("shutting down server...")
 
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
 	// 5秒内优雅关闭服务（将未处理完的请求处理完再关闭服务），超过5秒就超时退出
 	if err := server.Shutdown(ctx); err != nil {
-		zap.L().Error("server forced to shutdown:", zap.Error(err))
+		fmt.Println("server forced to shutdown:", zap.Error(err))
 	}
 
-	zap.L().Info("server exiting")
+	fmt.Println("server exiting")
 }
